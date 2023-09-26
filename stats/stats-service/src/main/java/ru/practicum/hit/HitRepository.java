@@ -9,8 +9,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface HitRepository extends JpaRepository<Hit, Long> {
-
-
     @Query("select new ru.practicum.stats.dto.StatsDto(h.app as app, "
             + "h.uri as uri, "
             + "COUNT(h) as hits) "
@@ -43,10 +41,3 @@ public interface HitRepository extends JpaRepository<Hit, Long> {
             + "GROUP BY h.app, h.uri")
     List<StatsDto> getStatsByPeriodWithUriUniqueIp(LocalDateTime start, LocalDateTime end, List<String> uris);
 }
-//List<StatsDto> findByTimestampAfterAndTimestampBefore(LocalDateTime start, LocalDateTime end);
-
-//List<StatsDto> findByTimestampAfterAndTimestampBeforeAndUriIn(LocalDateTime start, LocalDateTime end, List<String> uris);
-
-//List<StatsDto> findByTimestampAfterAndTimestampBeforeAndDistinctByIp(LocalDateTime start, LocalDateTime end);
-
-//List<StatsDto> findByTimestampAfterAndTimestampBeforeAndUriInAndDistinctByIp(LocalDateTime start, LocalDateTime end, List<String> uris);
