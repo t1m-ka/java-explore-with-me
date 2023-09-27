@@ -1,5 +1,6 @@
 package ru.practicum.hit.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -18,5 +19,6 @@ public class HitDto {
 
     private String ip;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime timestamp;
 }
