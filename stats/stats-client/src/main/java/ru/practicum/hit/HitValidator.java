@@ -9,6 +9,7 @@ public class HitValidator {
         return !StringUtils.isBlank(hitDto.getApp())
                 && !StringUtils.isBlank(hitDto.getUri())
                 && !StringUtils.isBlank(hitDto.getIp())
-                && hitDto.getTimestamp().isBefore(LocalDateTime.now());
+                && (hitDto.getTimestamp().isBefore(LocalDateTime.now())
+                || hitDto.getTimestamp().isEqual(LocalDateTime.now()));
     }
 }
