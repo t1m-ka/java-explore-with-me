@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.client.BaseClient;
 
-import static ru.practicum.exception.ServerErrorHandler.handleExceptionFromServer;
+import static ru.practicum.exception.ServerExceptionHandler.handleExceptionFromServer;
 
 @Service
 public class HitClient extends BaseClient {

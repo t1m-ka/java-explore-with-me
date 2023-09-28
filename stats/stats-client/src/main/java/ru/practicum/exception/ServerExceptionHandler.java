@@ -5,9 +5,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.ResponseEntity;
 
-public class ServerErrorHandler {
+public class ServerExceptionHandler {
     public static void handleExceptionFromServer(ResponseEntity<Object> responseEntity, ObjectMapper objectMapper) {
-        JsonNode jsonNode = null;
+        JsonNode jsonNode;
         try {
             jsonNode = objectMapper.readTree((String) responseEntity.getBody());
         } catch (JsonProcessingException e) {

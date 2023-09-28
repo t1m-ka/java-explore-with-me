@@ -1,24 +1,12 @@
 version: '3.1'
 services:
-  stats-client:
-    build: stats/stats-client
-    image: stats-client-image
-    container_name: stats-client-container
-    ports:
-      - "9090:9090"
-      - "9091:9091"
-    depends_on:
-      - stats-server
-    environment:
-      - STATS_SERVER_URL=http://stats-server:9000
-
   stats-server:
     build: stats/stats-service
     image: stats-service-image
     container_name: stats-service-container
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "9090:9090"
+      - "9091:9091"
     depends_on:
       - stats-db
     environment:
@@ -38,6 +26,8 @@ services:
 #  ewm-main-service:
 #    ports:
 #      - "8080:8080"
+#    environment:
+#      - STATS_SERVER_URL=http://stats-server:9090
 
 
 #  ewm-db:

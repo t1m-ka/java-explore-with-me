@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
-import static ru.practicum.exception.ServerErrorHandler.handleExceptionFromServer;
+import static ru.practicum.exception.ServerExceptionHandler.handleExceptionFromServer;
 
 @Service
 public class StatsClient extends BaseClient {

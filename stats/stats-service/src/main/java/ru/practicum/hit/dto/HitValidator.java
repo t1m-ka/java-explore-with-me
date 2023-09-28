@@ -1,4 +1,4 @@
-package ru.practicum.hit;
+package ru.practicum.hit.dto;
 
 import org.apache.commons.lang3.StringUtils;
 

@@ -6,8 +6,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.practicum.exception.ValidationException;
 import ru.practicum.hit.dto.HitDto;
 import ru.practicum.hit.service.HitService;
+
+import static ru.practicum.hit.dto.HitValidator.validateHitDto;
 
 @RestController
 @RequestMapping(path = "/hit")
@@ -19,6 +22,9 @@ public class HitController {
     @PostMapping
     public void saveHit(@RequestBody HitDto hitDto) {
         log.info("Поступил POST запрос на сохранение статистических данных (saveHit)");
-        service.saveHit(hitDto);
+        if (validateHitDto(hitDto))
+            service.saveHit(hitDto);
+        else
+            throw new ValidationException("Поступивший объект некорректен");
     }
 }
