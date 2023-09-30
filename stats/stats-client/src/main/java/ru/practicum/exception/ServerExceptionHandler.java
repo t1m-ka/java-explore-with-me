@@ -6,10 +6,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.ResponseEntity;
 
 public class ServerExceptionHandler {
-    public static void handleExceptionFromServer(ResponseEntity<Object> responseEntity, ObjectMapper objectMapper) {
+    public static void handleExceptionFromServer(ResponseEntity<String> responseEntity, ObjectMapper objectMapper) {
         JsonNode jsonNode;
         try {
-            jsonNode = objectMapper.readTree((String) responseEntity.getBody());
+            jsonNode = objectMapper.readTree(responseEntity.getBody());
         } catch (JsonProcessingException e) {
             throw new UnexpectedServerResponseException("Request processing error");
         }

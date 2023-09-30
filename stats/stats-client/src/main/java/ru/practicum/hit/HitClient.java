@@ -10,13 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.client.BaseClient;
 
-import static ru.practicum.exception.ServerExceptionHandler.handleExceptionFromServer;
-
 @Service
 public class HitClient extends BaseClient {
     private static final String API_PREFIX = "/hit";
-
-    private final ObjectMapper objectMapper;
 
     @Autowired
     public HitClient(@Value("${stats-service.url}") String serverUrl,
@@ -26,14 +22,12 @@ public class HitClient extends BaseClient {
                 builder
                         .uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl + API_PREFIX))
                         .requestFactory(HttpComponentsClientHttpRequestFactory::new)
-                        .build()
+                        .build(),
+                objectMapper
         );
-        this.objectMapper = objectMapper;
     }
 
     public void saveHit(HitDto hitDto) {
-        ResponseEntity<Object> responseEntity = post("", null, hitDto);
-        if (!responseEntity.getStatusCode().is2xxSuccessful())
-            handleExceptionFromServer(responseEntity, objectMapper);
+        ResponseEntity<HitDto> responseEntity = post("", null, hitDto);
     }
 }

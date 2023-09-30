@@ -14,13 +14,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
-import static ru.practicum.exception.ServerExceptionHandler.handleExceptionFromServer;
-
 @Service
 public class StatsClient extends BaseClient {
     private static final String API_PREFIX = "/stats";
-
-    private final ObjectMapper objectMapper;
 
     public StatsClient(@Value("${stats-service.url}") String serverUrl,
             RestTemplateBuilder builder,
@@ -29,9 +25,9 @@ public class StatsClient extends BaseClient {
                 builder
                         .uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl + API_PREFIX))
                         .requestFactory(HttpComponentsClientHttpRequestFactory::new)
-                        .build()
+                        .build(),
+                objectMapper
         );
-        this.objectMapper = objectMapper;
     }
 
     public List<StatsDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
@@ -52,8 +48,6 @@ public class StatsClient extends BaseClient {
                     "unique", unique);
             responseEntity = get("?start={start}&end={end}&unique={unique}", parameters);
         }
-        if (!responseEntity.getStatusCode().is2xxSuccessful())
-            handleExceptionFromServer(responseEntity, objectMapper);
         return objectMapper.convertValue(responseEntity.getBody(), new TypeReference<>() {
         });
     }
