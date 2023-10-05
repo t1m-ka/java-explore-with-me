@@ -30,5 +30,12 @@ services:
 #      - STATS_SERVER_URL=http://stats-server:9090
 
 
-#  ewm-db:
-#    image: postgres:14-alpine
+  ewm-db:
+    image: postgres:14-alpine
+    container_name: postgres-ewm-db
+    ports:
+      - "6542:5432"
+    environment:
+      - POSTGRES_DB=ewm
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=iamroot
