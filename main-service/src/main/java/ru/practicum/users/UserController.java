@@ -20,8 +20,8 @@ public class UserController {
     @GetMapping
     public List<UserDto> getUsers(
             @RequestParam(required = false) List<Long> ids,
-            @RequestParam(required = false) int from,
-            @RequestParam(required = false) int size) {
+            @RequestParam(required = false, defaultValue = "0") int from,
+            @RequestParam(required = false, defaultValue = "10") int size) {
         return null;
     }
 
