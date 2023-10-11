@@ -1,4 +1,4 @@
-package ru.practicum.exception;
+package ru.practicum.util.exception;
 
 public class EntityNotFoundException extends CustomException {
     public EntityNotFoundException(String message, String reason) {

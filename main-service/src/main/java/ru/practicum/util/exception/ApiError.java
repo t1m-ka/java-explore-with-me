@@ -1,7 +1,8 @@
-package ru.practicum.exception;
+package ru.practicum.util.exception;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -20,6 +21,14 @@ public class ApiError {
         this.errors = Arrays.asList(ex.getStackTrace());
         this.message = ex.getMessage();
         this.reason = ex.getReason();
+        this.status = status;
+        this.timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+    }
+
+    public  ApiError(DataIntegrityViolationException ex, String status) {
+        this.errors = Arrays.asList(ex.getStackTrace());
+        this.message = ex.getMessage();
+        this.reason = ex.getLocalizedMessage();
         this.status = status;
         this.timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     }

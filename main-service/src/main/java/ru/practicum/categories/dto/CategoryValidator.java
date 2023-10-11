@@ -1,7 +1,7 @@
 package ru.practicum.categories.dto;
 
 import org.apache.commons.lang3.StringUtils;
-import ru.practicum.exception.ValidationException;
+import ru.practicum.util.exception.ValidationException;
 
 public class CategoryValidator {
     public static void validateNewCategory(CategoryDto categoryDto) {

@@ -1,4 +1,4 @@
-package ru.practicum.exception;
+package ru.practicum.util.exception;
 
 public abstract class CustomException extends RuntimeException {
     private final String reason;

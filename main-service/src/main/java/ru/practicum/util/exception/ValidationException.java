@@ -1,4 +1,4 @@
-package ru.practicum.exception;
+package ru.practicum.util.exception;
 
 public class ValidationException extends CustomException {
     public ValidationException(String message, String reason) {
