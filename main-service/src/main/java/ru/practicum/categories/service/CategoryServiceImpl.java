@@ -28,14 +28,16 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public void deleteCategory(long catId) {
         repository.findById(catId).orElseThrow(
-                () -> new EntityNotFoundException("Required entity not found", "Category with id=" + catId + " was not found"));
+                () -> new EntityNotFoundException("Required entity not found",
+                        "Category with id=" + catId + " was not found"));
         repository.deleteById(catId);
     }
 
     @Override
     public CategoryDto updateCategory(long catId, CategoryDto categoryDto) {
         repository.findById(catId).orElseThrow(
-                () -> new EntityNotFoundException("Required entity not found", "Category with id=" + catId + " was not found"));
+                () -> new EntityNotFoundException("Required entity not found",
+                        "Category with id=" + catId + " was not found"));
         return toCategoryDto(repository.save(toCategory(categoryDto)));
     }
 
@@ -48,7 +50,8 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDto getCategoryById(long catId) {
         Category category = repository.findById(catId).orElseThrow(
-                () -> new EntityNotFoundException("Required entity not found", "Category with id=" + catId + " was not found"));
+                () -> new EntityNotFoundException("Required entity not found",
+                        "Category with id=" + catId + " was not found"));
         return toCategoryDto(category);
     }
 }

@@ -9,7 +9,7 @@ import ru.practicum.util.exception.ValidationException;
 
 import java.util.List;
 
-import static ru.practicum.categories.dto.CategoryValidator.validateNewCategory;
+import static ru.practicum.categories.dto.CategoryDtoValidator.validateNewCategory;
 import static ru.practicum.util.VariableValidator.validatePageableParams;
 
 @RestController

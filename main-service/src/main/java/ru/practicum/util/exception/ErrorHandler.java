@@ -26,5 +26,4 @@ public class ErrorHandler {
     public ApiError handleDataIntegrityViolationException(final DataIntegrityViolationException ex) {
         return new ApiError(ex, "CONFLICT");
     }
-
 }
