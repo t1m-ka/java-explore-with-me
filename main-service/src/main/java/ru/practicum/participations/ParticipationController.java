@@ -8,6 +8,9 @@ import ru.practicum.participations.service.ParticipationService;
 
 import java.util.List;
 
+import static ru.practicum.util.VariableValidator.validateNotNullObject;
+import static ru.practicum.util.VariableValidator.validatePositiveNumber;
+
 @RestController
 @RequiredArgsConstructor
 @Slf4j
@@ -16,22 +19,32 @@ public class ParticipationController {
 
     @GetMapping("/users/{userId}/requests")
     public List<ParticipationRequestDto> getUserParticipationRequestList(
-            @PathVariable long userId) {
-        return null;
+            @PathVariable Long userId) {
+        validateNotNullObject(userId, "userId");
+        validatePositiveNumber(userId, "userId");
+        return service.getUserParticipationRequestList(userId);
     }
 
-    @PostMapping("/users/{userId}/requests") //условия в спецификации
+    @PostMapping("/users/{userId}/requests")
     public ParticipationRequestDto createParticipationRequest(
-            @PathVariable long userId,
-            @RequestParam long eventId) {
-        return null;
+            @PathVariable Long userId,
+            @RequestParam Long eventId) {
+        validateNotNullObject(userId, "userId");
+        validatePositiveNumber(userId, "userId");
+        validateNotNullObject(eventId, "eventId");
+        validatePositiveNumber(eventId, "eventId");
+        return service.createParticipationRequest(userId, eventId);
     }
 
-    @PatchMapping("/users/{userId}/requests/{requestId}/cancel") //условия в спецификации
+    @PatchMapping("/users/{userId}/requests/{requestId}/cancel")
     public ParticipationRequestDto cancelParticipationRequest(
-            @PathVariable long userId,
-            @RequestParam long requestId) {
-        return null;
+            @PathVariable Long userId,
+            @RequestParam Long requestId) {
+        validateNotNullObject(userId, "userId");
+        validatePositiveNumber(userId, "userId");
+        validateNotNullObject(requestId, "requestId");
+        validatePositiveNumber(requestId, "requestId");
+        return service.cancelParticipationRequest(userId, requestId);
     }
 
 

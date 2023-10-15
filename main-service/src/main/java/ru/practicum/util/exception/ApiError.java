@@ -11,25 +11,26 @@ import java.util.List;
 
 @Getter @Setter
 public class ApiError {
-    private List<StackTraceElement> errors;
-    private String message;
-    private String reason;
     private String status;
+    private String reason;
+    private String message;
     private String timestamp;
 
+    private List<StackTraceElement> errors;
+
     public <T extends CustomException> ApiError(T ex, String status) {
-        this.errors = Arrays.asList(ex.getStackTrace());
-        this.message = ex.getMessage();
-        this.reason = ex.getReason();
         this.status = status;
+        this.reason = ex.getReason();
+        this.message = ex.getMessage();
         this.timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        this.errors = Arrays.asList(ex.getStackTrace());
     }
 
     public  ApiError(DataIntegrityViolationException ex, String status) {
-        this.errors = Arrays.asList(ex.getStackTrace());
-        this.message = ex.getMessage();
-        this.reason = ex.getLocalizedMessage();
         this.status = status;
+        this.reason = ex.getLocalizedMessage();
+        this.message = ex.getMessage();
         this.timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        this.errors = Arrays.asList(ex.getStackTrace());
     }
 }

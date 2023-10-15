@@ -26,4 +26,10 @@ public class ErrorHandler {
     public ApiError handleDataIntegrityViolationException(final DataIntegrityViolationException ex) {
         return new ApiError(ex, "CONFLICT");
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiError handleOperationForbiddenException(final OperationForbiddenException ex) {
+        return new ApiError(ex, "FORBIDDEN");
+    }
 }

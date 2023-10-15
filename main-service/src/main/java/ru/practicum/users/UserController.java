@@ -2,6 +2,8 @@ package ru.practicum.users;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.users.dto.UserDto;
 import ru.practicum.users.service.UserService;
@@ -15,6 +17,7 @@ import static ru.practicum.util.VariableValidator.*;
 @RequiredArgsConstructor
 @RequestMapping("/admin/users")
 @Slf4j
+@Validated
 public class UserController {
     private final UserService service;
 
@@ -23,13 +26,16 @@ public class UserController {
             @RequestParam(required = false) List<Long> ids,
             @RequestParam(required = false, defaultValue = "0") int from,
             @RequestParam(required = false, defaultValue = "10") int size) {
-        ids.forEach(x -> validateNotNullVariable(x, "id"));
-        ids.forEach(x -> validatePositiveVariable(x, "id"));
+        if (ids != null) {
+            ids.forEach(x -> validateNotNullObject(x, "id"));
+            ids.forEach(x -> validatePositiveNumber(x, "id"));
+        }
         validatePageableParams(from, size);
         return service.getUsers(ids, from, size);
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public UserDto createUser(@RequestBody UserDto userDto) {
         validateNewUser(userDto);
         return service.createUser(userDto);
@@ -37,8 +43,8 @@ public class UserController {
 
     @DeleteMapping("/{userId}")
     public void deleteUserById(@PathVariable Long userId) {
-        validateNotNullVariable(userId, "userId");
-        validatePositiveVariable(userId, "userId");
+        validateNotNullObject(userId, "userId");
+        validatePositiveNumber(userId, "userId");
         service.deleteUserById(userId);
     }
 }
