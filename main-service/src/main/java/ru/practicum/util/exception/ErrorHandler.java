@@ -29,7 +29,20 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiError handleEntityAlreadyExistsException(final EntityAlreadyExistsException ex) {
+        return new ApiError(ex, "CONFLICT");
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.FORBIDDEN)
     public ApiError handleOperationForbiddenException(final OperationForbiddenException ex) {
         return new ApiError(ex, "FORBIDDEN");
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiError handleRequestConflictException(final RequestConflictException ex) {
+        return new ApiError(ex, "CONFLICT");
+    }
+
 }

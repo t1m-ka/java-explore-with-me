@@ -1,11 +1,11 @@
 package ru.practicum.util;
 
 import org.apache.commons.lang3.StringUtils;
-import ru.practicum.events.dto.enums.EventAdminStateAction;
-import ru.practicum.events.dto.enums.EventRequestStatus;
-import ru.practicum.events.dto.enums.EventUserStateAction;
-import ru.practicum.events.dto.enums.SortOption;
-import ru.practicum.events.model.Location;
+import ru.practicum.event.dto.enums.EventAdminStateAction;
+import ru.practicum.participation.dto.ParticipationRequestStatus;
+import ru.practicum.event.dto.enums.EventUserStateAction;
+import ru.practicum.event.dto.enums.SortOption;
+import ru.practicum.event.model.Location;
 import ru.practicum.util.exception.OperationForbiddenException;
 import ru.practicum.util.exception.RequiredArgsMissingException;
 import ru.practicum.util.exception.ValidationException;
@@ -102,7 +102,7 @@ public class VariableValidator {
     }
 
     public static void validateEventRequestStatus(String value) {
-        if (!EventRequestStatus.isValid(value))
+        if (!ParticipationRequestStatus.isValid(value))
             throw new OperationForbiddenException("For the requested operation the conditions are not met",
                     "Field: status. Error: значение статуса может быть: CONFIRMED, REJECTED. "
                             + "Value:" + value);

@@ -1,6 +1,6 @@
 package ru.practicum.compilation.model;
 
-import ru.practicum.events.model.Event;
+import ru.practicum.event.model.Event;
 
 import javax.persistence.*;
 import java.util.Set;
