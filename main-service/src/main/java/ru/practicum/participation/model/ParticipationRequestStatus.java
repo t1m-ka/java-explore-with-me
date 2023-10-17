@@ -1,4 +1,4 @@
-package ru.practicum.participation.dto;
+package ru.practicum.participation.model;
 
 public enum ParticipationRequestStatus {
     //ожидание рассмотрения

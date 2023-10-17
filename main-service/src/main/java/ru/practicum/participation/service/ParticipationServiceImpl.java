@@ -2,12 +2,13 @@ package ru.practicum.participation.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.event.model.Event;
 import ru.practicum.event.model.EventState;
 import ru.practicum.event.repository.EventRepository;
 import ru.practicum.participation.dto.ParticipationMapper;
 import ru.practicum.participation.dto.ParticipationRequestDto;
-import ru.practicum.participation.dto.ParticipationRequestStatus;
+import ru.practicum.participation.model.ParticipationRequestStatus;
 import ru.practicum.participation.model.ParticipationRequest;
 import ru.practicum.participation.repository.ParticipationRepository;
 import ru.practicum.user.model.User;
@@ -40,6 +41,7 @@ public class ParticipationServiceImpl implements ParticipationService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     @Override
     public ParticipationRequestDto createParticipationRequest(long userId, long eventId) {
         User requester = userRepository.findById(userId).orElseThrow(
@@ -62,21 +64,26 @@ public class ParticipationServiceImpl implements ParticipationService {
                 throw new EntityAlreadyExistsException("Entity already exist",
                         "Запрос на участие в этом событии уже создан.");
         }
-        int requestCount = participationRepository.findAllPublishedEventsById(eventId,
-                ParticipationRequestStatus.CONFIRMED).size();
-        if (event.getParticipantLimit() <= requestCount)
+        int requestCount = participationRepository.findAllPublishedEventsById(eventId).size();
+        if (event.getParticipantLimit() != 0 && event.getParticipantLimit() <= requestCount)
             throw new RequestConflictException("Invalid operation",
                     "Достигнут лимит запросов на участие в событии.");
+
+        ParticipationRequestStatus newRequestStatus;
+        if (event.isRequestModeration())
+            newRequestStatus = ParticipationRequestStatus.PENDING;
+        else {
+            newRequestStatus = ParticipationRequestStatus.CONFIRMED;
+            event.setConfirmedRequests(event.getConfirmedRequests() + 1);
+        }
 
         ParticipationRequest createdRequest = ParticipationRequest.builder()
                 .created(LocalDateTime.now())
                 .event(event)
                 .requester(requester)
-                .requestStatus(ParticipationRequestStatus.PENDING)
+                .requestStatus(newRequestStatus)
                 .build();
 
-        if (!event.isRequestModeration())
-            createdRequest.setRequestStatus(ParticipationRequestStatus.CONFIRMED);
         return toParticipationRequestDto(participationRepository.save(createdRequest));
     }
 

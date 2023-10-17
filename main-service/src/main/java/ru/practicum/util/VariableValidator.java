@@ -2,7 +2,8 @@ package ru.practicum.util;
 
 import org.apache.commons.lang3.StringUtils;
 import ru.practicum.event.dto.enums.EventAdminStateAction;
-import ru.practicum.participation.dto.ParticipationRequestStatus;
+import ru.practicum.event.model.EventState;
+import ru.practicum.participation.model.ParticipationRequestStatus;
 import ru.practicum.event.dto.enums.EventUserStateAction;
 import ru.practicum.event.dto.enums.SortOption;
 import ru.practicum.event.model.Location;
@@ -87,6 +88,13 @@ public class VariableValidator {
         validatePositiveNumber(location.getLon(), "lon");
     }
 
+    public static void validateEventState(String value) {
+        if (!EventState.isValid(value))
+            throw new OperationForbiddenException("For the requested operation the conditions are not met",
+                    "Field: state. Error: значение статуса может быть: PENDING, PUBLISHED, REJECTED, CANCELED. "
+                            + "Value:" + value);
+    }
+
     public static void validateEventUserStateAction(String value) {
         if (!EventUserStateAction.isValid(value))
             throw new OperationForbiddenException("For the requested operation the conditions are not met",
@@ -101,7 +109,7 @@ public class VariableValidator {
                             + "Value:" + value);
     }
 
-    public static void validateEventRequestStatus(String value) {
+    public static void validateParticipationRequestStatus(String value) {
         if (!ParticipationRequestStatus.isValid(value))
             throw new OperationForbiddenException("For the requested operation the conditions are not met",
                     "Field: status. Error: значение статуса может быть: CONFIRMED, REJECTED. "

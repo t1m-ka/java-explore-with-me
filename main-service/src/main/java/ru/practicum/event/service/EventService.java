@@ -16,7 +16,7 @@ public interface EventService {
 
     List<ParticipationRequestDto> getUserEventParticipationRequests(long userId, long eventId);
 
-    EventRequestStatusUpdateResult changeParticipationStatus(long userId, Long eventId,
+    EventRequestStatusUpdateResult changeParticipationStatus(long userId, long eventId,
             EventRequestStatusUpdateRequest statusUpdateRequest);
 
     List<EventFullDto> searchEvents(
@@ -33,7 +33,7 @@ public interface EventService {
     List<EventShortDto> getEventFiltered(
             String text,
             List<Long> categories,
-            boolean paid,
+            Boolean paid,
             String rangeStart,
             String rangeEnd,
             boolean onlyAvailable,

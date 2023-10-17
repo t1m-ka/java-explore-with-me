@@ -12,8 +12,6 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 public class EventFullDto {
-    private long id;
-
     private String annotation;
 
     private CategoryDto categoryDto;
@@ -25,6 +23,8 @@ public class EventFullDto {
     private String description;
 
     private LocalDateTime eventDate;
+
+    private long id;
 
     private UserShortDto initiatorShortDto;
 

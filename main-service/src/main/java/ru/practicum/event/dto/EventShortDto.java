@@ -10,8 +10,6 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 public class EventShortDto {
-    private long id;
-
     private String annotation;
 
     private CategoryDto categoryDto;
@@ -19,6 +17,8 @@ public class EventShortDto {
     private long confirmedRequests;
 
     private LocalDateTime eventDate;
+
+    private long id;
 
     private UserShortDto initiatorShortDto;
 

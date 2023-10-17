@@ -2,7 +2,6 @@ package ru.practicum.participation.model;
 
 import lombok.*;
 import ru.practicum.event.model.Event;
-import ru.practicum.participation.dto.ParticipationRequestStatus;
 import ru.practicum.user.model.User;
 
 import javax.persistence.*;

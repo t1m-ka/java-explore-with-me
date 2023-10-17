@@ -10,7 +10,8 @@ public class EventDtoValidator {
     private static final int MAX_ANNOTATION_LENGTH = 2000;
     private static final int MIN_DESCRIPTION_LENGTH = 20;
     private static final int MAX_DESCRIPTION_LENGTH = 7000;
-    private static final int MIN_HOURS_BEFORE_EVENT = 2;
+    private static final int MIN_HOURS_BEFORE_EVENT_USER = 2;
+    private static final int MIN_HOURS_BEFORE_EVENT_ADMIN = 1;
     private static final int MIN_TITLE_LENGTH = 3;
     private static final int MAX_TITLE_LENGTH = 120;
 
@@ -29,7 +30,7 @@ public class EventDtoValidator {
         validateFutureDateTime(
                 LocalDateTime.parse(eventDto.getEventDate(), DATE_TIME_FORMATTER),
                 "eventDate",
-                MIN_HOURS_BEFORE_EVENT);
+                MIN_HOURS_BEFORE_EVENT_USER);
 
         validateNotNullObject(eventDto.getLocation(), "location");
         validateLocation(eventDto.getLocation());
@@ -52,10 +53,16 @@ public class EventDtoValidator {
 
         if (eventDto.getEventDate() != null) {
             validateDateTimeFormat(eventDto.getEventDate(), "eventDate");
-            validateFutureDateTime(
-                    LocalDateTime.parse(eventDto.getEventDate(), DATE_TIME_FORMATTER),
-                    "eventDate",
-                    MIN_HOURS_BEFORE_EVENT);
+            if (isAdmin)
+                validateFutureDateTime(
+                        LocalDateTime.parse(eventDto.getEventDate(), DATE_TIME_FORMATTER),
+                        "eventDate",
+                        MIN_HOURS_BEFORE_EVENT_ADMIN);
+            else
+                validateFutureDateTime(
+                        LocalDateTime.parse(eventDto.getEventDate(), DATE_TIME_FORMATTER),
+                        "eventDate",
+                        MIN_HOURS_BEFORE_EVENT_USER);
         }
 
         if (eventDto.getLocation() != null)
@@ -76,6 +83,6 @@ public class EventDtoValidator {
 
     public static void validateUpdateRequestStatus(EventRequestStatusUpdateRequest statusUpdateRequest) {
         validateNotNullObject(statusUpdateRequest.getRequestIds(), "requestIds");
-        validateEventRequestStatus(statusUpdateRequest.getStatus());
+        validateParticipationRequestStatus(statusUpdateRequest.getStatus());
     }
 }
