@@ -2,6 +2,7 @@ package ru.practicum.event;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.event.dto.*;
 import ru.practicum.event.service.EventService;
@@ -31,6 +32,7 @@ public class EventController {
     }
 
     @PostMapping("/users/{userId}/events")
+    @ResponseStatus(HttpStatus.CREATED)
     public EventFullDto createEvent(
             @PathVariable Long userId,
             @RequestBody NewEventDto newEventDto) {
@@ -98,6 +100,14 @@ public class EventController {
             @RequestParam(required = false) String rangeEnd,
             @RequestParam(required = false, defaultValue = "0") int from,
             @RequestParam(required = false, defaultValue = "10") int size) {
+        if (users != null) {
+            users.forEach(x -> validateNotNullObject(x, "users"));
+            users.forEach(x -> validatePositiveNumber(x, "users"));
+        }
+        if (categories != null) {
+            categories.forEach(x -> validateNotNullObject(x, "categories"));
+            categories.forEach(x -> validatePositiveNumber(x, "categories"));
+        }
         if (rangeStart != null)
             validateDateTimeFormat(rangeStart, "rangeStart");
         if (rangeEnd != null)
@@ -131,6 +141,10 @@ public class EventController {
             @RequestParam(required = false, defaultValue = "10") int size) {
         if (text != null)
             validateStringNotBlank(text, "text");
+        if (categories != null) {
+            categories.forEach(x -> validateNotNullObject(x, "categories"));
+            categories.forEach(x -> validatePositiveNumber(x, "categories"));
+        }
         if (rangeStart != null)
             validateDateTimeFormat(rangeStart, "rangeStart");
         if (rangeEnd != null)
@@ -138,7 +152,8 @@ public class EventController {
         if (sort != null)
             validateSortOptions(sort);
         validatePageableParams(from, size);
-        return service.getEventFiltered(request, text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
+        return service.getEventFiltered(request, text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort,
+                from, size);
     }
 
     @GetMapping("/events/{id}")

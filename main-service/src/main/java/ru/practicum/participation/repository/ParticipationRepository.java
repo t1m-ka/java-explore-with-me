@@ -1,14 +1,16 @@
 package ru.practicum.participation.repository;
 
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import ru.practicum.participation.model.ParticipationRequest;
-import ru.practicum.user.model.User;
 
 import java.util.List;
 
 public interface ParticipationRepository extends JpaRepository<ParticipationRequest, Long> {
+    /*@Query("select participation "
+            + "from ParticipationRequest as participation "
+            + "join participation.requester as requester "
+            + "where requester.id = ?1 ")*/
     List<ParticipationRequest> findAllByRequesterId(long requesterId);
 
     @Query("select participation "

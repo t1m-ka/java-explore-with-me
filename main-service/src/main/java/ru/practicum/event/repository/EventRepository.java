@@ -9,6 +9,7 @@ import ru.practicum.event.model.EventState;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface EventRepository extends JpaRepository<Event, Long> {
     List<Event> findAllByInitiatorId(long initiatorId, Pageable pageable);
@@ -20,8 +21,8 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             + "where (:userIds is null OR initiator.id IN :userIds) "
             + "and (:states is null OR event.state IN :states) "
             + "and (:categoryIds is null OR category.id IN :categoryIds) "
-            + "and (:rangeStart is null OR event.eventDate > :rangeStart) "
-            + "and (:rangeEnd is null OR event.eventDate < :rangeEnd)")
+            + "and (cast(:rangeStart as timestamp) is null OR event.eventDate > :rangeStart) "
+            + "and (cast(:rangeEnd as timestamp) is null OR event.eventDate < :rangeEnd)")
     List<Event> searchEventsByAdmin(
             @Param("userIds") List<Long> users,
             @Param("states") List<EventState> states,
@@ -36,10 +37,10 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             + "where (lower(event.annotation) like lower(concat('%', :text, '%')) "
             + "or lower(event.description) like lower(concat('%', :text, '%'))) "
             + "and (:paid is null OR event.paid = :paid) "
-            + "and (:onlyAvailable = false OR (event.confirmedRequests < event.participantLimit)) "
+            + "and (:onlyAvailable = true OR (event.confirmedRequests < event.participantLimit)) "
             + "and (:categoryIds is null OR category.id IN :categoryIds) "
-            + "and (:rangeStart is null OR event.eventDate > :rangeStart) "
-            + "and (:rangeEnd is null OR event.eventDate < :rangeEnd)")
+            + "and (cast(:rangeStart as timestamp) is null OR event.eventDate > :rangeStart) "
+            + "and (cast(:rangeEnd as timestamp) is null OR event.eventDate < :rangeEnd)")
     List<Event> getEventFiltered(
             @Param("text") String text,
             @Param("paid") Boolean paid,
@@ -54,4 +55,10 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             + "where event.id IN ?1 "
             + "and event.state = 'PUBLISHED'")
     List<Event> findAllPublishedByEventIdList(List<Long> events);
+
+    @Query("select event "
+            + "from Event as event "
+            + "where event.id = ?1 "
+            + "and event.state = 'PUBLISHED'")
+    Optional<Event> findPublishedEvent(long eventId);
 }

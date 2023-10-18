@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS event (
     lat FLOAT NOT NUll,
     lon FLOAT NOT NUll,
     paid BOOLEAN DEFAULT FALSE,
-    participant_limit INTEGER DEFAULT 0,
+    participant_limit INT DEFAULT 0,
     published_on TIMESTAMP WITHOUT TIME ZONE,
     request_moderation BOOLEAN DEFAULT TRUE,
     state VARCHAR(20) NOT NULL,
@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS participation (
     created TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     event_id BIGINT NOT NULL,
     requester_id BIGINT NOT NULL,
-    status VARCHAR(20) NOT NULL,
+    request_status VARCHAR(20) NOT NULL,
     CONSTRAINT pk_participation PRIMARY KEY (id),
     CONSTRAINT fk_participation_to_event FOREIGN KEY(event_id) REFERENCES event(id),
     CONSTRAINT fk_participation_to_ewm_user FOREIGN KEY(requester_id) REFERENCES ewm_user(id)

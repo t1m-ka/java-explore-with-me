@@ -84,8 +84,6 @@ public class VariableValidator {
     public static void validateLocation(Location location) {
         validateNotNullObject(location.getLat(), "lat");
         validateNotNullObject(location.getLon(), "lon");
-        validatePositiveNumber(location.getLat(), "lat");
-        validatePositiveNumber(location.getLon(), "lon");
     }
 
     public static void validateEventState(String value) {

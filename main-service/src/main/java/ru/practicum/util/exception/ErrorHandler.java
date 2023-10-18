@@ -16,6 +16,13 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleRequiredArgsMissingException(final RequiredArgsMissingException ex) {
+        return new ApiError(ex, "BAD_REQUEST");
+    }
+
+
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ApiError handleEntityNotFoundException(final EntityNotFoundException ex) {
         return new ApiError(ex, "NOT_FOUND");

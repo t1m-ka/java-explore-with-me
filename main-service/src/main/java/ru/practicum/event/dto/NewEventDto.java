@@ -2,9 +2,11 @@ package ru.practicum.event.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 import ru.practicum.event.model.Location;
 
 @Getter
+@Setter
 @AllArgsConstructor
 public class NewEventDto {
     private String annotation;

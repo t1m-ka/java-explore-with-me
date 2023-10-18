@@ -1,5 +1,6 @@
 package ru.practicum.event.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,15 +17,16 @@ import java.time.LocalDateTime;
 public class EventShortDto {
     private String annotation;
 
-    private CategoryDto categoryDto;
+    private CategoryDto category;
 
     private long confirmedRequests;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
 
     private long id;
 
-    private UserShortDto initiatorShortDto;
+    private UserShortDto initiator;
 
     private boolean paid;
 

@@ -2,14 +2,12 @@ package ru.practicum.event.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 import ru.practicum.category.model.Category;
 import ru.practicum.category.repository.CategoryRepository;
 import ru.practicum.event.dto.*;
@@ -24,6 +22,8 @@ import ru.practicum.participation.dto.ParticipationRequestDto;
 import ru.practicum.participation.model.ParticipationRequest;
 import ru.practicum.participation.model.ParticipationRequestStatus;
 import ru.practicum.participation.repository.ParticipationRepository;
+import ru.practicum.stats.StatsClient;
+import ru.practicum.stats.StatsDto;
 import ru.practicum.user.model.User;
 import ru.practicum.user.repository.UserRepository;
 import ru.practicum.util.VariableValidator;
@@ -33,6 +33,7 @@ import ru.practicum.util.exception.RequestConflictException;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -54,6 +55,7 @@ public class EventServiceImpl implements EventService {
     private final ParticipationRepository participationRepository;
     private final CategoryRepository categoryRepository;
     private final HitClient hitClient;
+    private final StatsClient statsClient;
 
     public EventServiceImpl(EventRepository eventRepository,
                             UserRepository userRepository,
@@ -67,6 +69,7 @@ public class EventServiceImpl implements EventService {
         this.participationRepository = participationRepository;
         this.categoryRepository = categoryRepository;
         this.hitClient = new HitClient(statServiceUrl, builder, objectMapper);
+        this.statsClient = new StatsClient(statServiceUrl, builder, objectMapper);
     }
 
     @Override
@@ -193,7 +196,7 @@ public class EventServiceImpl implements EventService {
         if (!StringUtils.isBlank(rangeStart))
             start = LocalDateTime.parse(rangeStart, DATE_TIME_FORMATTER);
         if (!StringUtils.isBlank(rangeEnd))
-            end = LocalDateTime.parse(rangeStart, DATE_TIME_FORMATTER);
+            end = LocalDateTime.parse(rangeEnd, DATE_TIME_FORMATTER);
 
         return eventRepository.searchEventsByAdmin(users, eventStatesList, categories,
                         start, end, makePageable(from, size)).stream()
@@ -231,7 +234,7 @@ public class EventServiceImpl implements EventService {
         if (!StringUtils.isBlank(rangeStart))
             start = LocalDateTime.parse(rangeStart, DATE_TIME_FORMATTER);
         if (!StringUtils.isBlank(rangeEnd))
-            end = LocalDateTime.parse(rangeStart, DATE_TIME_FORMATTER);
+            end = LocalDateTime.parse(rangeEnd, DATE_TIME_FORMATTER);
 
         return eventRepository.getEventFiltered(text, paid, onlyAvailable, categories, start, end, pageable)
                 .stream()
@@ -239,10 +242,21 @@ public class EventServiceImpl implements EventService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     @Override
     public EventFullDto getEventById(HttpServletRequest request, long eventId) {
         makeStatsHit(request);
-        return toEventFullDto(findEvent(eventId));
+        Event event = eventRepository.findPublishedEvent(eventId).orElseThrow(
+                () -> new EntityNotFoundException("Required entity not found",
+                        "Published event with id=" + eventId + "was not found"));
+
+        List<StatsDto> statsList = statsClient.getStats(
+                LocalDateTime.now().minusDays(1),
+                LocalDateTime.now(),
+                Collections.singletonList(request.getRequestURI()),
+                true);
+        event.setViews(statsList.size());
+        return toEventFullDto(event);
     }
 
     private void makeStatsHit(HttpServletRequest request) {
@@ -296,6 +310,7 @@ public class EventServiceImpl implements EventService {
             if (isAdmin) {
                 if (updateEventDto.getStateAction().equals(PUBLISH_EVENT.name()) && event.getState() == PENDING) {
                     event.setState(PUBLISHED);
+                    event.setPublishedOn(LocalDateTime.now());
                 } else if (updateEventDto.getStateAction().equals(REJECT_EVENT.name()) && event.getState() == PENDING) {
                     event.setState(REJECTED);
                 } else {
