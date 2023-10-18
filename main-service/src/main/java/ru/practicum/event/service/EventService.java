@@ -3,6 +3,7 @@ package ru.practicum.event.service;
 import ru.practicum.event.dto.*;
 import ru.practicum.participation.dto.ParticipationRequestDto;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 public interface EventService {
@@ -31,6 +32,7 @@ public interface EventService {
     EventFullDto updateEventByAdmin(long eventId, UpdateEventRequest updateEventDto);
 
     List<EventShortDto> getEventFiltered(
+            HttpServletRequest request,
             String text,
             List<Long> categories,
             Boolean paid,
@@ -41,5 +43,5 @@ public interface EventService {
             int from,
             int size);
 
-    EventFullDto getEventById(long eventId);
+    EventFullDto getEventById(HttpServletRequest request, long eventId);
 }

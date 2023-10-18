@@ -7,6 +7,7 @@ import ru.practicum.event.dto.*;
 import ru.practicum.event.service.EventService;
 import ru.practicum.participation.dto.ParticipationRequestDto;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 import static ru.practicum.event.dto.EventDtoValidator.*;
@@ -118,6 +119,7 @@ public class EventController {
 
     @GetMapping("/events")
     public List<EventShortDto> getEventFiltered(
+            HttpServletRequest request,
             @RequestParam(required = false) String text,
             @RequestParam(required = false) List<Long> categories,
             @RequestParam(required = false) Boolean paid,
@@ -135,14 +137,15 @@ public class EventController {
             validateDateTimeFormat(rangeEnd, "rangeEnd");
         validateSortOptions(sort);
         validatePageableParams(from, size);
-        return service.getEventFiltered(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
+        return service.getEventFiltered(request, text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
     }
 
     @GetMapping("/events/{id}")
     public EventFullDto getEventById(
+            HttpServletRequest request,
             @PathVariable("id") Long eventId) {
         validateNotNullObject(eventId, "id");
         validatePositiveNumber(eventId, "id");
-        return service.getEventById(eventId);
+        return service.getEventById(request, eventId);
     }
 }

@@ -1,11 +1,15 @@
 package ru.practicum.event.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 import ru.practicum.category.model.Category;
 import ru.practicum.category.repository.CategoryRepository;
 import ru.practicum.event.dto.*;
@@ -13,6 +17,8 @@ import ru.practicum.event.dto.enums.SortOption;
 import ru.practicum.event.model.Event;
 import ru.practicum.event.model.EventState;
 import ru.practicum.event.repository.EventRepository;
+import ru.practicum.hit.HitClient;
+import ru.practicum.hit.HitDto;
 import ru.practicum.participation.dto.ParticipationMapper;
 import ru.practicum.participation.dto.ParticipationRequestDto;
 import ru.practicum.participation.model.ParticipationRequest;
@@ -24,6 +30,7 @@ import ru.practicum.util.VariableValidator;
 import ru.practicum.util.exception.EntityNotFoundException;
 import ru.practicum.util.exception.RequestConflictException;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,12 +48,26 @@ import static ru.practicum.util.PageParamsMaker.makePageableWithSort;
 import static ru.practicum.util.VariableValidator.DATE_TIME_FORMATTER;
 
 @Service
-@RequiredArgsConstructor
 public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
     private final ParticipationRepository participationRepository;
     private final CategoryRepository categoryRepository;
+    private final HitClient hitClient;
+
+    public EventServiceImpl(EventRepository eventRepository,
+                            UserRepository userRepository,
+                            ParticipationRepository participationRepository,
+                            CategoryRepository categoryRepository,
+                            @Value("${stats-service.url}") String statServiceUrl,
+                            RestTemplateBuilder builder,
+                            ObjectMapper objectMapper) {
+        this.eventRepository = eventRepository;
+        this.userRepository = userRepository;
+        this.participationRepository = participationRepository;
+        this.categoryRepository = categoryRepository;
+        this.hitClient = new HitClient(statServiceUrl, builder, objectMapper);
+    }
 
     @Override
     public List<EventShortDto> getUserEventList(long userId, int from, int size) {
@@ -189,9 +210,10 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public List<EventShortDto> getEventFiltered(String text, List<Long> categories, Boolean paid, String rangeStart,
-                                                String rangeEnd, boolean onlyAvailable, String sort, int from, int size) {
-
+    public List<EventShortDto> getEventFiltered(HttpServletRequest request, String text, List<Long> categories,
+                                                Boolean paid, String rangeStart, String rangeEnd, boolean onlyAvailable,
+                                                String sort, int from, int size) {
+        makeStatsHit(request);
         Sort sortParam;
         Pageable pageable;
         if (sort != null) {
@@ -218,8 +240,18 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventFullDto getEventById(long eventId) {
+    public EventFullDto getEventById(HttpServletRequest request, long eventId) {
+        makeStatsHit(request);
         return toEventFullDto(findEvent(eventId));
+    }
+
+    private void makeStatsHit(HttpServletRequest request) {
+        HitDto hitDto = new HitDto();
+        hitDto.setApp("ewm-main-service");
+        hitDto.setUri(request.getRequestURI());
+        hitDto.setIp(request.getRemoteAddr());
+        hitDto.setTimestamp(LocalDateTime.now());
+        hitClient.saveHit(hitDto);
     }
 
     private User findUser(long userId) {
