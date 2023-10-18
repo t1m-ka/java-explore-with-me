@@ -135,7 +135,8 @@ public class EventController {
             validateDateTimeFormat(rangeStart, "rangeStart");
         if (rangeEnd != null)
             validateDateTimeFormat(rangeEnd, "rangeEnd");
-        validateSortOptions(sort);
+        if (sort != null)
+            validateSortOptions(sort);
         validatePageableParams(from, size);
         return service.getEventFiltered(request, text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
     }

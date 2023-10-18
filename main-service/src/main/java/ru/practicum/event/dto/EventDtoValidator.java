@@ -19,8 +19,8 @@ public class EventDtoValidator {
         validateStringNotBlank(eventDto.getAnnotation(), "annotation");
         validateStringLength(eventDto.getAnnotation(), "annotation", MIN_ANNOTATION_LENGTH, MAX_ANNOTATION_LENGTH);
 
-        validateNotNullObject(eventDto.getCategoryId(), "category");
-        validatePositiveNumber(eventDto.getCategoryId(), "category");
+        validateNotNullObject(eventDto.getCategory(), "category");
+        validatePositiveNumber(eventDto.getCategory(), "category");
 
         validateStringNotBlank(eventDto.getDescription(), "description");
         validateStringLength(eventDto.getDescription(), "description", MIN_DESCRIPTION_LENGTH, MAX_DESCRIPTION_LENGTH);

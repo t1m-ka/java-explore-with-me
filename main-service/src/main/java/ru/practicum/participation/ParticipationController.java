@@ -28,7 +28,7 @@ public class ParticipationController {
     @PostMapping("/users/{userId}/requests")
     public ParticipationRequestDto createParticipationRequest(
             @PathVariable Long userId,
-            @RequestParam Long eventId) {
+            @RequestParam(required = false) Long eventId) {
         validateNotNullObject(userId, "userId");
         validatePositiveNumber(userId, "userId");
         validateNotNullObject(eventId, "eventId");

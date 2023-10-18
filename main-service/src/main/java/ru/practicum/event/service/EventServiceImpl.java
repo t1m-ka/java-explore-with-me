@@ -82,7 +82,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventFullDto createEvent(long userId, NewEventDto newEventDto) {
         User initiator = findUser(userId);
-        Category category = findCategory(newEventDto.getCategoryId());
+        Category category = findCategory(newEventDto.getCategory());
 
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime eventDate = LocalDateTime.parse(newEventDto.getEventDate(), DATE_TIME_FORMATTER);

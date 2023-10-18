@@ -9,7 +9,7 @@ import ru.practicum.event.model.Location;
 public class NewEventDto {
     private String annotation;
 
-    private Long categoryId;
+    private Long category;
 
     private String description;
 
