@@ -128,7 +128,7 @@ public class EventServiceImpl implements EventService {
     @Transactional
     @Override
     public EventRequestStatusUpdateResult changeParticipationStatus(long userId, long eventId,
-            EventRequestStatusUpdateRequest statusUpdateRequest) {
+                                                                    EventRequestStatusUpdateRequest statusUpdateRequest) {
         findUser(userId);
         findEvent(eventId);
         List<ParticipationRequest> requestList =
@@ -161,7 +161,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<EventFullDto> searchEvents(List<Long> users, List<String> states, List<Long> categories,
-            String rangeStart, String rangeEnd, int from, int size) {
+                                           String rangeStart, String rangeEnd, int from, int size) {
         LocalDateTime start = null;
         LocalDateTime end = null;
         states.forEach(VariableValidator::validateEventState);
@@ -190,7 +190,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<EventShortDto> getEventFiltered(String text, List<Long> categories, Boolean paid, String rangeStart,
-            String rangeEnd, boolean onlyAvailable, String sort, int from, int size) {
+                                                String rangeEnd, boolean onlyAvailable, String sort, int from, int size) {
 
         Sort sortParam;
         Pageable pageable;
@@ -211,15 +211,15 @@ public class EventServiceImpl implements EventService {
         if (!StringUtils.isBlank(rangeEnd))
             end = LocalDateTime.parse(rangeStart, DATE_TIME_FORMATTER);
 
-        return null; /*eventRepository.getEventFiltered(text, paid, onlyAvailable, categories, start, end, pageable)
+        return eventRepository.getEventFiltered(text, paid, onlyAvailable, categories, start, end, pageable)
                 .stream()
                 .map(EventMapper::toEventShortDto)
-                .collect(Collectors.toList());*/
+                .collect(Collectors.toList());
     }
 
     @Override
     public EventFullDto getEventById(long eventId) {
-        return null;
+        return toEventFullDto(findEvent(eventId));
     }
 
     private User findUser(long userId) {

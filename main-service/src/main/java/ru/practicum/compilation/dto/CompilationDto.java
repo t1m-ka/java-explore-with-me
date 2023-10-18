@@ -10,6 +10,8 @@ import java.util.List;
 public class CompilationDto {
     private List<Long> events;
 
+    private Long id;
+
     private Boolean pinned = false;
 
     private String title;

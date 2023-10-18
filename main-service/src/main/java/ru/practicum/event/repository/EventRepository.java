@@ -22,7 +22,8 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             + "and (:categoryIds is null OR category.id IN :categoryIds) "
             + "and (:rangeStart is null OR event.eventDate > :rangeStart) "
             + "and (:rangeEnd is null OR event.eventDate < :rangeEnd)")
-    List<Event> searchEventsByAdmin(@Param("userIds") List<Long> users,
+    List<Event> searchEventsByAdmin(
+            @Param("userIds") List<Long> users,
             @Param("states") List<EventState> states,
             @Param("categoryIds") List<Long> categories,
             @Param("rangeStart") LocalDateTime rangeStart,
@@ -33,9 +34,9 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             + "from Event as event "
             + "join event.category as category "
             + "where (lower(event.annotation) like lower(concat('%', :text, '%')) "
-            + "or (lower(event.description) like lower(concat('%', :text, '%'))) "
+            + "or lower(event.description) like lower(concat('%', :text, '%'))) "
             + "and (:paid is null OR event.paid = :paid) "
-            + "and (:onlyAvailable = false OR event.confirmedRequests < event.participantLimit) "
+            + "and (:onlyAvailable = false OR (event.confirmedRequests < event.participantLimit)) "
             + "and (:categoryIds is null OR category.id IN :categoryIds) "
             + "and (:rangeStart is null OR event.eventDate > :rangeStart) "
             + "and (:rangeEnd is null OR event.eventDate < :rangeEnd)")
@@ -47,4 +48,10 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             @Param("rangeStart") LocalDateTime rangeStart,
             @Param("rangeEnd") LocalDateTime rangeEnd,
             Pageable pageable);
+
+    @Query("select event "
+            + "from Event as event "
+            + "where event.id IN ?1 "
+            + "and event.state = 'PUBLISHED'")
+    List<Event> findAllPublishedByEventIdList(List<Long> events);
 }
