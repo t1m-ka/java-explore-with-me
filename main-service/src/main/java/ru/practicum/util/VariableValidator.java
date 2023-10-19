@@ -2,11 +2,11 @@ package ru.practicum.util;
 
 import org.apache.commons.lang3.StringUtils;
 import ru.practicum.event.dto.enums.EventAdminStateAction;
-import ru.practicum.event.model.EventState;
-import ru.practicum.participation.model.ParticipationRequestStatus;
 import ru.practicum.event.dto.enums.EventUserStateAction;
 import ru.practicum.event.dto.enums.SortOption;
+import ru.practicum.event.model.EventState;
 import ru.practicum.event.model.Location;
+import ru.practicum.participation.model.ParticipationRequestStatus;
 import ru.practicum.util.exception.OperationForbiddenException;
 import ru.practicum.util.exception.RequiredArgsMissingException;
 import ru.practicum.util.exception.ValidationException;

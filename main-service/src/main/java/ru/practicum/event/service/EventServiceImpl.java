@@ -1,9 +1,9 @@
 package ru.practicum.event.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -58,12 +58,12 @@ public class EventServiceImpl implements EventService {
     private final StatsClient statsClient;
 
     public EventServiceImpl(EventRepository eventRepository,
-                            UserRepository userRepository,
-                            ParticipationRepository participationRepository,
-                            CategoryRepository categoryRepository,
-                            @Value("${stats-service.url}") String statServiceUrl,
-                            RestTemplateBuilder builder,
-                            ObjectMapper objectMapper) {
+            UserRepository userRepository,
+            ParticipationRepository participationRepository,
+            CategoryRepository categoryRepository,
+            @Value("${stats-service.url}") String statServiceUrl,
+            RestTemplateBuilder builder,
+            ObjectMapper objectMapper) {
         this.eventRepository = eventRepository;
         this.userRepository = userRepository;
         this.participationRepository = participationRepository;
@@ -152,34 +152,43 @@ public class EventServiceImpl implements EventService {
     @Transactional
     @Override
     public EventRequestStatusUpdateResult changeParticipationStatus(long userId, long eventId,
-                                                                    EventRequestStatusUpdateRequest statusUpdateRequest) {
+            EventRequestStatusUpdateRequest statusUpdateRequest) {
         User initiator = findUser(userId);
         Event event = findEvent(eventId);
         if (initiator.getId() != event.getInitiator().getId())
             throw new RequestConflictException("Invalid operation",
                     "Одобрять запросы на участие может только инициатор события.");
+
         List<ParticipationRequest> requestList =
                 participationRepository.findRequestsByIdsList(eventId, statusUpdateRequest.getRequestIds());
-        List<ParticipationRequestDto> confirmedRequests = new ArrayList<>();
-        List<ParticipationRequestDto> rejectedRequests = new ArrayList<>();
-
-        for (ParticipationRequest request : requestList) {
+        requestList.forEach(request -> {
             if (!request.getRequestStatus().equals(ParticipationRequestStatus.PENDING))
                 throw new RequestConflictException("Invalid operation",
                         "Запрос с id=" + request.getId() + " имеет статус '" + request.getRequestStatus()
                                 + "'. Изменение невозможно.");
-            Event requestedEvent = request.getEvent();
-            if (statusUpdateRequest.getStatus().equals(ParticipationRequestStatus.REJECTED.name())) {
-                request.setRequestStatus(ParticipationRequestStatus.REJECTED);
+        });
+
+        List<ParticipationRequestDto> confirmedRequests = new ArrayList<>();
+        List<ParticipationRequestDto> rejectedRequests = new ArrayList<>();
+        ParticipationRequestStatus newStatus;
+        if (statusUpdateRequest.getStatus().equals(ParticipationRequestStatus.REJECTED.name())) {
+            newStatus = ParticipationRequestStatus.REJECTED;
+            for (ParticipationRequest request : requestList) {
+                request.setRequestStatus(newStatus);
                 rejectedRequests.add(toParticipationRequestDto(request));
-            } else {
-                if (requestedEvent.getParticipantLimit() == 0 || requestedEvent.getConfirmedRequests() < requestedEvent.getParticipantLimit()) {
-                    request.setRequestStatus(ParticipationRequestStatus.CONFIRMED);
+            }
+        } else {
+            newStatus = ParticipationRequestStatus.CONFIRMED;
+            for (ParticipationRequest request : requestList) {
+                Event requestedEvent = request.getEvent();
+                if (requestedEvent.getConfirmedRequests() < requestedEvent.getParticipantLimit()) {
+                    request.setRequestStatus(newStatus);
                     requestedEvent.setConfirmedRequests(requestedEvent.getConfirmedRequests() + 1);
                     confirmedRequests.add(toParticipationRequestDto(request));
                 } else {
                     request.setRequestStatus(ParticipationRequestStatus.REJECTED);
-                    rejectedRequests.add(toParticipationRequestDto(request));
+                    throw new RequestConflictException("Invalid operation",
+                            "Достигнут лимит участников события с id=" + requestedEvent.getId() + ".");
                 }
             }
         }
@@ -188,7 +197,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<EventFullDto> searchEvents(List<Long> users, List<String> states, List<Long> categories,
-                                           String rangeStart, String rangeEnd, int from, int size) {
+            String rangeStart, String rangeEnd, int from, int size) {
         LocalDateTime start = null;
         LocalDateTime end = null;
         List<EventState> eventStatesList = null;
@@ -220,8 +229,8 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<EventShortDto> getEventFiltered(HttpServletRequest request, String text, List<Long> categories,
-                                                Boolean paid, String rangeStart, String rangeEnd, boolean onlyAvailable,
-                                                String sort, int from, int size) {
+            Boolean paid, String rangeStart, String rangeEnd, boolean onlyAvailable,
+            String sort, int from, int size) {
         makeStatsHit(request);
         Sort sortParam;
         Pageable pageable;

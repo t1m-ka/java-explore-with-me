@@ -8,8 +8,8 @@ import ru.practicum.event.model.EventState;
 import ru.practicum.event.repository.EventRepository;
 import ru.practicum.participation.dto.ParticipationMapper;
 import ru.practicum.participation.dto.ParticipationRequestDto;
-import ru.practicum.participation.model.ParticipationRequestStatus;
 import ru.practicum.participation.model.ParticipationRequest;
+import ru.practicum.participation.model.ParticipationRequestStatus;
 import ru.practicum.participation.repository.ParticipationRepository;
 import ru.practicum.user.model.User;
 import ru.practicum.user.repository.UserRepository;
@@ -70,11 +70,11 @@ public class ParticipationServiceImpl implements ParticipationService {
                     "Достигнут лимит запросов на участие в событии.");
 
         ParticipationRequestStatus newRequestStatus;
-        if (event.isRequestModeration())
-            newRequestStatus = ParticipationRequestStatus.PENDING;
-        else {
+        if (!event.isRequestModeration() || event.getParticipantLimit() == 0) {
             newRequestStatus = ParticipationRequestStatus.CONFIRMED;
             event.setConfirmedRequests(event.getConfirmedRequests() + 1);
+        } else {
+            newRequestStatus = ParticipationRequestStatus.PENDING;
         }
 
         ParticipationRequest createdRequest = ParticipationRequest.builder()

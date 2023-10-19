@@ -1,8 +1,6 @@
 package ru.practicum.event.model;
 
-import ru.practicum.event.dto.enums.EventUserStateAction;
 import ru.practicum.util.exception.OperationForbiddenException;
-import ru.practicum.util.exception.ValidationException;
 
 public enum EventState {
     PENDING,

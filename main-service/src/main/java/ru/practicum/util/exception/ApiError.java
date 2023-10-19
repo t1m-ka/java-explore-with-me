@@ -9,7 +9,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 
-@Getter @Setter
+@Getter
+@Setter
 public class ApiError {
     private String status;
     private String reason;
@@ -26,7 +27,7 @@ public class ApiError {
         this.errors = Arrays.asList(ex.getStackTrace());
     }
 
-    public  ApiError(DataIntegrityViolationException ex, String status) {
+    public ApiError(DataIntegrityViolationException ex, String status) {
         this.status = status;
         this.reason = ex.getLocalizedMessage();
         this.message = ex.getMessage();

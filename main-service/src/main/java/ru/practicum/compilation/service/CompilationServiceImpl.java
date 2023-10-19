@@ -5,8 +5,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.compilation.dto.CompilationDto;
-import ru.practicum.compilation.dto.NewCompilationDto;
 import ru.practicum.compilation.dto.CompilationMapper;
+import ru.practicum.compilation.dto.NewCompilationDto;
 import ru.practicum.compilation.dto.UpdateCompilationDto;
 import ru.practicum.compilation.model.Compilation;
 import ru.practicum.compilation.repository.CompilationRepository;
@@ -18,7 +18,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static ru.practicum.compilation.dto.CompilationMapper.*;
+import static ru.practicum.compilation.dto.CompilationMapper.toCompilation;
+import static ru.practicum.compilation.dto.CompilationMapper.toCompilationDto;
 import static ru.practicum.util.PageParamsMaker.makePageable;
 
 @Service

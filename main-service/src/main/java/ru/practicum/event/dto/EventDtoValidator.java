@@ -3,7 +3,6 @@ package ru.practicum.event.dto;
 import java.time.LocalDateTime;
 
 import static ru.practicum.util.VariableValidator.*;
-import static ru.practicum.util.VariableValidator.validateNotNullObject;
 
 public class EventDtoValidator {
     private static final int MIN_ANNOTATION_LENGTH = 20;
