@@ -2,10 +2,8 @@ package ru.practicum.hit;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 import ru.practicum.exception.ValidationException;
 import ru.practicum.hit.dto.HitDto;
 import ru.practicum.hit.service.HitService;
@@ -20,6 +18,7 @@ public class HitController {
     private final HitService service;
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public void saveHit(@RequestBody HitDto hitDto) {
         log.info("Поступил POST запрос на сохранение статистических данных (saveHit)");
         if (validateHitDto(hitDto))
