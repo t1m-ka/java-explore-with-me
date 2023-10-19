@@ -2,8 +2,11 @@ package ru.practicum.compilation;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.compilation.dto.CompilationDto;
+import ru.practicum.compilation.dto.NewCompilationDto;
+import ru.practicum.compilation.dto.UpdateCompilationDto;
 import ru.practicum.compilation.service.CompilationService;
 
 import java.util.List;
@@ -36,14 +39,16 @@ public class CompilationController {
     }
 
     @PostMapping("/admin/compilations")
+    @ResponseStatus(HttpStatus.CREATED)
     public CompilationDto createCompilation(
-            @RequestBody CompilationDto compilationDto) {
-        validateNotNullObject(compilationDto, "CompilationDto");
-        validateNewCompilationDto(compilationDto);
-        return service.createCompilation(compilationDto);
+            @RequestBody NewCompilationDto newCompilationDto) {
+        validateNotNullObject(newCompilationDto, "CompilationDto");
+        validateNewCompilationDto(newCompilationDto);
+        return service.createCompilation(newCompilationDto);
     }
 
     @DeleteMapping("/admin/compilations/{compId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCompilation(
             @PathVariable Long compId) {
         validateNotNullObject(compId, "compId");
@@ -54,11 +59,11 @@ public class CompilationController {
     @PatchMapping("/admin/compilations/{compId}")
     public CompilationDto updateCompilation(
             @PathVariable Long compId,
-            @RequestBody CompilationDto compilationDto) {
+            @RequestBody UpdateCompilationDto updateCompilationDto) {
         validateNotNullObject(compId, "compId");
         validatePositiveNumber(compId, "compId");
-        validateNotNullObject(compilationDto, "CompilationDto");
-        validateUpdateCompilationDto(compilationDto);
-        return service.updateCompilation(compId, compilationDto);
+        validateNotNullObject(updateCompilationDto, "CompilationDto");
+        validateUpdateCompilationDto(updateCompilationDto);
+        return service.updateCompilation(compId, updateCompilationDto);
     }
 }

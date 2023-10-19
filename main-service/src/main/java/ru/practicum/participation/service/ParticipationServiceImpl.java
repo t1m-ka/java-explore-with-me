@@ -64,7 +64,7 @@ public class ParticipationServiceImpl implements ParticipationService {
                 throw new EntityAlreadyExistsException("Entity already exist",
                         "Запрос на участие в этом событии уже создан.");
         }
-        int requestCount = participationRepository.findAllPublishedEventsById(eventId).size();
+        int requestCount = participationRepository.findAllConfirmedRequestsByEventId(eventId).size();
         if (event.getParticipantLimit() != 0 && event.getParticipantLimit() <= requestCount)
             throw new RequestConflictException("Invalid operation",
                     "Достигнут лимит запросов на участие в событии.");

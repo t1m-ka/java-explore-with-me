@@ -2,6 +2,7 @@ package ru.practicum.participation;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.participation.dto.ParticipationRequestDto;
 import ru.practicum.participation.service.ParticipationService;
@@ -26,6 +27,7 @@ public class ParticipationController {
     }
 
     @PostMapping("/users/{userId}/requests")
+    @ResponseStatus(HttpStatus.CREATED)
     public ParticipationRequestDto createParticipationRequest(
             @PathVariable Long userId,
             @RequestParam(required = false) Long eventId) {
@@ -39,7 +41,7 @@ public class ParticipationController {
     @PatchMapping("/users/{userId}/requests/{requestId}/cancel")
     public ParticipationRequestDto cancelParticipationRequest(
             @PathVariable Long userId,
-            @RequestParam Long requestId) {
+            @PathVariable Long requestId) {
         validateNotNullObject(userId, "userId");
         validatePositiveNumber(userId, "userId");
         validateNotNullObject(requestId, "requestId");

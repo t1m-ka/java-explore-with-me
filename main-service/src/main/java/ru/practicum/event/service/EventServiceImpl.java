@@ -153,26 +153,29 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventRequestStatusUpdateResult changeParticipationStatus(long userId, long eventId,
                                                                     EventRequestStatusUpdateRequest statusUpdateRequest) {
-        findUser(userId);
-        findEvent(eventId);
+        User initiator = findUser(userId);
+        Event event = findEvent(eventId);
+        if (initiator.getId() != event.getInitiator().getId())
+            throw new RequestConflictException("Invalid operation",
+                    "Одобрять запросы на участие может только инициатор события.");
         List<ParticipationRequest> requestList =
-                participationRepository.findUserRequestsByEventIdsList(userId, statusUpdateRequest.getRequestIds());
+                participationRepository.findRequestsByIdsList(eventId, statusUpdateRequest.getRequestIds());
         List<ParticipationRequestDto> confirmedRequests = new ArrayList<>();
         List<ParticipationRequestDto> rejectedRequests = new ArrayList<>();
 
         for (ParticipationRequest request : requestList) {
-            Event event = request.getEvent();
-
             if (!request.getRequestStatus().equals(ParticipationRequestStatus.PENDING))
                 throw new RequestConflictException("Invalid operation",
-                        "Запрос с id=" + request.getId() + " имеет статус '" + request.getRequestStatus() + "'.");
+                        "Запрос с id=" + request.getId() + " имеет статус '" + request.getRequestStatus()
+                                + "'. Изменение невозможно.");
+            Event requestedEvent = request.getEvent();
             if (statusUpdateRequest.getStatus().equals(ParticipationRequestStatus.REJECTED.name())) {
                 request.setRequestStatus(ParticipationRequestStatus.REJECTED);
                 rejectedRequests.add(toParticipationRequestDto(request));
             } else {
-                if (event.getParticipantLimit() == 0 || event.getConfirmedRequests() < event.getParticipantLimit()) {
+                if (requestedEvent.getParticipantLimit() == 0 || requestedEvent.getConfirmedRequests() < requestedEvent.getParticipantLimit()) {
                     request.setRequestStatus(ParticipationRequestStatus.CONFIRMED);
-                    event.setConfirmedRequests(event.getConfirmedRequests() + 1);
+                    requestedEvent.setConfirmedRequests(requestedEvent.getConfirmedRequests() + 1);
                     confirmedRequests.add(toParticipationRequestDto(request));
                 } else {
                     request.setRequestStatus(ParticipationRequestStatus.REJECTED);
@@ -188,10 +191,13 @@ public class EventServiceImpl implements EventService {
                                            String rangeStart, String rangeEnd, int from, int size) {
         LocalDateTime start = null;
         LocalDateTime end = null;
-        states.forEach(VariableValidator::validateEventState);
-        List<EventState> eventStatesList = states.stream()
-                .map(EventState::fromString)
-                .collect(Collectors.toList());
+        List<EventState> eventStatesList = null;
+        if (states != null && !states.isEmpty()) {
+            states.forEach(VariableValidator::validateEventState);
+            eventStatesList = states.stream()
+                    .map(EventState::fromString)
+                    .collect(Collectors.toList());
+        }
 
         if (!StringUtils.isBlank(rangeStart))
             start = LocalDateTime.parse(rangeStart, DATE_TIME_FORMATTER);

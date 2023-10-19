@@ -1,6 +1,7 @@
 package ru.practicum.category;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.category.dto.CategoryDto;
 import ru.practicum.category.service.CategoryService;
@@ -18,12 +19,14 @@ public class CategoryController {
     private final CategoryService service;
 
     @PostMapping("/admin/categories")
+    @ResponseStatus(HttpStatus.CREATED)
     public CategoryDto createCategory(@RequestBody CategoryDto categoryDto) {
         validateNewCategory(categoryDto);
         return service.createCategory(categoryDto);
     }
 
     @DeleteMapping("/admin/categories/{catId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCategory(@PathVariable Long catId) {
         if (catId == null)
             throw new RequiredArgsMissingException("Required variable is missing", "Path variable 'catId' is missing");

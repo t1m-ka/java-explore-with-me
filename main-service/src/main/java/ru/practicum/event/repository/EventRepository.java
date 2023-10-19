@@ -34,10 +34,10 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     @Query("select event "
             + "from Event as event "
             + "join event.category as category "
-            + "where (lower(event.annotation) like lower(concat('%', :text, '%')) "
+            + "where ((:text is null) or lower(event.annotation) like lower(concat('%', :text, '%')) "
             + "or lower(event.description) like lower(concat('%', :text, '%'))) "
             + "and (:paid is null OR event.paid = :paid) "
-            + "and (:onlyAvailable = true OR (event.confirmedRequests < event.participantLimit)) "
+            + "and (:onlyAvailable = false OR (event.confirmedRequests < event.participantLimit)) "
             + "and (:categoryIds is null OR category.id IN :categoryIds) "
             + "and (cast(:rangeStart as timestamp) is null OR event.eventDate > :rangeStart) "
             + "and (cast(:rangeEnd as timestamp) is null OR event.eventDate < :rangeEnd)")
@@ -55,6 +55,11 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             + "where event.id IN ?1 "
             + "and event.state = 'PUBLISHED'")
     List<Event> findAllPublishedByEventIdList(List<Long> events);
+
+    @Query("select event "
+            + "from Event as event "
+            + "where event.id IN ?1 ")
+    List<Event> findAllByEventIdList(List<Long> events);
 
     @Query("select event "
             + "from Event as event "
