@@ -64,7 +64,7 @@ public class ParticipationServiceImpl implements ParticipationService {
                 throw new EntityAlreadyExistsException("Entity already exist",
                         "Запрос на участие в этом событии уже создан.");
         }
-        int requestCount = participationRepository.findAllPublishedEventsById(eventId).size();
+        int requestCount = participationRepository.findAllConfirmedRequestsByEventId(eventId).size();
         if (event.getParticipantLimit() != 0 && event.getParticipantLimit() <= requestCount)
             throw new RequestConflictException("Invalid operation",
                     "Достигнут лимит запросов на участие в событии.");
@@ -87,6 +87,7 @@ public class ParticipationServiceImpl implements ParticipationService {
         return toParticipationRequestDto(participationRepository.save(createdRequest));
     }
 
+    @Transactional
     @Override
     public ParticipationRequestDto cancelParticipationRequest(long userId, long requestId) {
         ParticipationRequest participationRequest = participationRepository.findById(requestId).orElseThrow(
@@ -96,10 +97,18 @@ public class ParticipationServiceImpl implements ParticipationService {
                 () -> new EntityNotFoundException("Required entity not found",
                         "User with id=" + userId + "was not found"));
 
-        if (participationRequest.getRequester().getId() != userId)
+        if (participationRequest.getRequester().getId() != requester.getId())
             throw new RequestConflictException("Invalid operation",
                     "Отменить запрос на участие в событии может только создатель запроса.");
+        if (participationRequest.getRequestStatus() == ParticipationRequestStatus.CANCELED)
+            throw new RequestConflictException("Invalid operation",
+                    "Запрос на участие в событии уже имеет статус 'CANCELED'.");
+        if (participationRequest.getRequestStatus() == ParticipationRequestStatus.CONFIRMED) {
+            Event event = participationRequest.getEvent();
+            event.setConfirmedRequests(event.getConfirmedRequests() - 1);
+        }
         participationRequest.setRequestStatus(ParticipationRequestStatus.CANCELED);
+
         return toParticipationRequestDto(participationRepository.save(participationRequest));
     }
 }

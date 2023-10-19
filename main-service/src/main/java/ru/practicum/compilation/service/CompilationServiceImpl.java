@@ -4,23 +4,21 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.category.repository.CategoryRepository;
 import ru.practicum.compilation.dto.CompilationDto;
+import ru.practicum.compilation.dto.NewCompilationDto;
 import ru.practicum.compilation.dto.CompilationMapper;
+import ru.practicum.compilation.dto.UpdateCompilationDto;
 import ru.practicum.compilation.model.Compilation;
 import ru.practicum.compilation.repository.CompilationRepository;
 import ru.practicum.event.model.Event;
 import ru.practicum.event.repository.EventRepository;
-import ru.practicum.participation.repository.ParticipationRepository;
-import ru.practicum.user.repository.UserRepository;
 import ru.practicum.util.exception.EntityNotFoundException;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static ru.practicum.compilation.dto.CompilationMapper.toCompilation;
-import static ru.practicum.compilation.dto.CompilationMapper.toCompilationDto;
+import static ru.practicum.compilation.dto.CompilationMapper.*;
 import static ru.practicum.util.PageParamsMaker.makePageable;
 
 @Service
@@ -42,9 +40,9 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     @Override
-    public CompilationDto createCompilation(CompilationDto compilationDto) {
-        List<Event> eventList = eventRepository.findAllPublishedByEventIdList(compilationDto.getEvents());
-        return toCompilationDto(compilationRepository.save(toCompilation(compilationDto, eventList)));
+    public CompilationDto createCompilation(NewCompilationDto newCompilationDto) {
+        List<Event> eventList = eventRepository.findAllByEventIdList(newCompilationDto.getEvents());
+        return toCompilationDto(compilationRepository.save(toCompilation(newCompilationDto, eventList)));
     }
 
     @Override
@@ -55,17 +53,17 @@ public class CompilationServiceImpl implements CompilationService {
 
     @Transactional
     @Override
-    public CompilationDto updateCompilation(long compId, CompilationDto compilationDto) {
+    public CompilationDto updateCompilation(long compId, UpdateCompilationDto updateCompilationDto) {
         Compilation compilation = findCompilation(compId);
         List<Event> eventList;
-        if (compilationDto.getEvents() != null) {
-            eventList = eventRepository.findAllPublishedByEventIdList(compilationDto.getEvents());
+        if (updateCompilationDto.getEvents() != null) {
+            eventList = eventRepository.findAllPublishedByEventIdList(updateCompilationDto.getEvents());
             compilation.setEvents(new HashSet<>(eventList));
         }
-        if (compilationDto.getPinned() != null)
-            compilation.setPinned(compilationDto.getPinned());
-        if (StringUtils.isBlank(compilationDto.getTitle()))
-            compilation.setTitle(compilationDto.getTitle());
+        if (updateCompilationDto.getPinned() != null)
+            compilation.setPinned(updateCompilationDto.getPinned());
+        if (!StringUtils.isBlank(updateCompilationDto.getTitle()))
+            compilation.setTitle(updateCompilationDto.getTitle());
         return toCompilationDto(compilation);
     }
 

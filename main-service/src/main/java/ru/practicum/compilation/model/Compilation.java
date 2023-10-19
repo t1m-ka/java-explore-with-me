@@ -12,6 +12,7 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Compilation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +28,6 @@ public class Compilation {
     @JoinTable(
             name = "event_compilation",
             joinColumns = @JoinColumn(name = "compilation_id"),
-            inverseJoinColumns = @JoinColumn(name = "event_id")
-    )
+            inverseJoinColumns = @JoinColumn(name = "event_id"))
     private Set<Event> events;
 }

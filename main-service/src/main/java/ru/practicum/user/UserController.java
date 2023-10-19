@@ -42,6 +42,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUserById(@PathVariable Long userId) {
         validateNotNullObject(userId, "userId");
         validatePositiveNumber(userId, "userId");

@@ -72,11 +72,11 @@ public class VariableValidator {
     public static void validateFutureDateTime(LocalDateTime var, String varName, int timeInterval) {
         LocalDateTime now = LocalDateTime.now();
         if (var.isBefore(now))
-            throw new OperationForbiddenException("For the requested operation the conditions are not met",
+            throw new ValidationException("For the requested operation the conditions are not met",
                     "Field: " + varName + ". Error: должно содержать дату, которая еще не наступила. "
                             + "Value:" + var);
         if (var.isBefore(now.plusHours(timeInterval)))
-            throw new OperationForbiddenException("For the requested operation the conditions are not met",
+            throw new ValidationException("For the requested operation the conditions are not met",
                     "Field: " + varName + ". Error: должно содержать время не раньше чем через "
                             + timeInterval + " часа. Value: " + var);
     }

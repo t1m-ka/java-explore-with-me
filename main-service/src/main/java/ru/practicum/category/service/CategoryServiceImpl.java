@@ -35,9 +35,11 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDto updateCategory(long catId, CategoryDto categoryDto) {
-        repository.findById(catId).orElseThrow(
+        Category category = repository.findById(catId).orElseThrow(
                 () -> new EntityNotFoundException("Required entity not found",
                         "Category with id=" + catId + " was not found"));
+        if (category.getName().equals(categoryDto.getName()))
+            return toCategoryDto(category);
         return toCategoryDto(repository.save(toCategory(categoryDto)));
     }
 

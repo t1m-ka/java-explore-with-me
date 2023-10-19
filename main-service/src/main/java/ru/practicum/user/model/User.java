@@ -16,11 +16,11 @@ import javax.persistence.*;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    long id;
+    private long id;
 
     @Column
-    String name;
+    private String name;
 
     @Column
-    String email;
+    private String email;
 }
