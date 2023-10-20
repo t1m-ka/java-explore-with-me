@@ -2,6 +2,7 @@ package ru.practicum.category.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.category.dto.CategoryDto;
 import ru.practicum.category.dto.CategoryMapper;
 import ru.practicum.category.model.Category;
@@ -36,15 +37,15 @@ public class CategoryServiceImpl implements CategoryService {
         repository.deleteById(catId);
     }
 
+    @Transactional
     @Override
     public CategoryDto updateCategory(Long catId, CategoryDto categoryDto) {
         validateNotNullObject(catId, "catId");
         validatePositiveNumber(catId, "catId");
         validateNewCategory(categoryDto);
         Category category = findCategory(catId);
-        if (category.getName().equals(categoryDto.getName()))
-            return toCategoryDto(category);
-        return toCategoryDto(repository.save(toCategory(categoryDto)));
+        category.setName(categoryDto.getName());
+        return toCategoryDto(category);
     }
 
     @Override
