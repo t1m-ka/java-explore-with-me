@@ -20,7 +20,10 @@ import java.util.stream.Collectors;
 
 import static ru.practicum.compilation.dto.CompilationMapper.toCompilation;
 import static ru.practicum.compilation.dto.CompilationMapper.toCompilationDto;
+import static ru.practicum.compilation.dto.CompilationValidator.validateNewCompilationDto;
+import static ru.practicum.compilation.dto.CompilationValidator.validateUpdateCompilationDto;
 import static ru.practicum.util.PageParamsMaker.makePageable;
+import static ru.practicum.util.VariableValidator.*;
 
 @Service
 @RequiredArgsConstructor
@@ -30,31 +33,42 @@ public class CompilationServiceImpl implements CompilationService {
 
     @Override
     public List<CompilationDto> getCompilation(Boolean pinned, int from, int size) {
+        validatePageableParams(from, size);
         return compilationRepository.findAllCompilations(pinned, makePageable(from, size)).stream()
                 .map(CompilationMapper::toCompilationDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public CompilationDto getCompilationById(long compId) {
+    public CompilationDto getCompilationById(Long compId) {
+        validateNotNullObject(compId, "compId");
+        validatePositiveNumber(compId, "compId");
         return toCompilationDto(findCompilation(compId));
     }
 
     @Override
     public CompilationDto createCompilation(NewCompilationDto newCompilationDto) {
+        validateNotNullObject(newCompilationDto, "CompilationDto");
+        validateNewCompilationDto(newCompilationDto);
         List<Event> eventList = eventRepository.findAllByEventIdList(newCompilationDto.getEvents());
         return toCompilationDto(compilationRepository.save(toCompilation(newCompilationDto, eventList)));
     }
 
     @Override
-    public void deleteCompilation(long compId) {
+    public void deleteCompilation(Long compId) {
+        validateNotNullObject(compId, "compId");
+        validatePositiveNumber(compId, "compId");
         findCompilation(compId);
         compilationRepository.deleteById(compId);
     }
 
     @Transactional
     @Override
-    public CompilationDto updateCompilation(long compId, UpdateCompilationDto updateCompilationDto) {
+    public CompilationDto updateCompilation(Long compId, UpdateCompilationDto updateCompilationDto) {
+        validateNotNullObject(compId, "compId");
+        validatePositiveNumber(compId, "compId");
+        validateNotNullObject(updateCompilationDto, "CompilationDto");
+        validateUpdateCompilationDto(updateCompilationDto);
         Compilation compilation = findCompilation(compId);
         List<Event> eventList;
         if (updateCompilationDto.getEvents() != null) {

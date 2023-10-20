@@ -5,9 +5,9 @@ import ru.practicum.participation.dto.ParticipationRequestDto;
 import java.util.List;
 
 public interface ParticipationService {
-    List<ParticipationRequestDto> getUserParticipationRequestList(long userId);
+    List<ParticipationRequestDto> getUserParticipationRequestList(Long userId);
 
-    ParticipationRequestDto createParticipationRequest(long userId, long eventId);
+    ParticipationRequestDto createParticipationRequest(Long userId, Long eventId);
 
-    ParticipationRequestDto cancelParticipationRequest(long userId, long requestId);
+    ParticipationRequestDto cancelParticipationRequest(Long userId, Long requestId);
 }

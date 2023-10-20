@@ -11,9 +11,11 @@ import ru.practicum.util.exception.EntityNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static ru.practicum.category.dto.CategoryDtoValidator.validateNewCategory;
 import static ru.practicum.category.dto.CategoryMapper.toCategory;
 import static ru.practicum.category.dto.CategoryMapper.toCategoryDto;
 import static ru.practicum.util.PageParamsMaker.makePageable;
+import static ru.practicum.util.VariableValidator.*;
 
 @Service
 @RequiredArgsConstructor
@@ -22,22 +24,24 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDto createCategory(CategoryDto categoryDto) {
+        validateNewCategory(categoryDto);
         return toCategoryDto(repository.save(toCategory(categoryDto)));
     }
 
     @Override
-    public void deleteCategory(long catId) {
-        repository.findById(catId).orElseThrow(
-                () -> new EntityNotFoundException("Required entity not found",
-                        "Category with id=" + catId + " was not found"));
+    public void deleteCategory(Long catId) {
+        validateNotNullObject(catId, "catId");
+        validatePositiveNumber(catId, "catId");
+        findCategory(catId);
         repository.deleteById(catId);
     }
 
     @Override
-    public CategoryDto updateCategory(long catId, CategoryDto categoryDto) {
-        Category category = repository.findById(catId).orElseThrow(
-                () -> new EntityNotFoundException("Required entity not found",
-                        "Category with id=" + catId + " was not found"));
+    public CategoryDto updateCategory(Long catId, CategoryDto categoryDto) {
+        validateNotNullObject(catId, "catId");
+        validatePositiveNumber(catId, "catId");
+        validateNewCategory(categoryDto);
+        Category category = findCategory(catId);
         if (category.getName().equals(categoryDto.getName()))
             return toCategoryDto(category);
         return toCategoryDto(repository.save(toCategory(categoryDto)));
@@ -45,15 +49,22 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<CategoryDto> getCategoryList(int from, int size) {
+        validatePageableParams(from, size);
         List<Category> categoryList = repository.findAll(makePageable(from, size)).getContent();
         return categoryList.stream().map(CategoryMapper::toCategoryDto).collect(Collectors.toList());
     }
 
     @Override
-    public CategoryDto getCategoryById(long catId) {
-        Category category = repository.findById(catId).orElseThrow(
+    public CategoryDto getCategoryById(Long catId) {
+        validateNotNullObject(catId, "catId");
+        validatePositiveNumber(catId, "catId");
+        Category category = findCategory(catId);
+        return toCategoryDto(category);
+    }
+
+    private Category findCategory(long catId) {
+        return repository.findById(catId).orElseThrow(
                 () -> new EntityNotFoundException("Required entity not found",
                         "Category with id=" + catId + " was not found"));
-        return toCategoryDto(category);
     }
 }

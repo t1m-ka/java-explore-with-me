@@ -37,6 +37,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static ru.practicum.event.dto.EventDtoValidator.*;
 import static ru.practicum.event.dto.EventMapper.toEventFullDto;
 import static ru.practicum.event.dto.enums.EventAdminStateAction.PUBLISH_EVENT;
 import static ru.practicum.event.dto.enums.EventAdminStateAction.REJECT_EVENT;
@@ -46,7 +47,8 @@ import static ru.practicum.event.model.EventState.*;
 import static ru.practicum.participation.dto.ParticipationMapper.toParticipationRequestDto;
 import static ru.practicum.util.PageParamsMaker.makePageable;
 import static ru.practicum.util.PageParamsMaker.makePageableWithSort;
-import static ru.practicum.util.VariableValidator.DATE_TIME_FORMATTER;
+import static ru.practicum.util.VariableValidator.*;
+import static ru.practicum.util.VariableValidator.validatePageableParams;
 
 @Service
 public class EventServiceImpl implements EventService {
@@ -73,7 +75,10 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public List<EventShortDto> getUserEventList(long userId, int from, int size) {
+    public List<EventShortDto> getUserEventList(Long userId, int from, int size) {
+        validateNotNullObject(userId, "userId");
+        validatePositiveNumber(userId, "userId");
+        validatePageableParams(from, size);
         findUser(userId);
         List<Event> initiatorEventList = eventRepository.findAllByInitiatorId(userId, makePageable(from, size));
         return initiatorEventList
@@ -83,7 +88,10 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventFullDto createEvent(long userId, NewEventDto newEventDto) {
+    public EventFullDto createEvent(Long userId, NewEventDto newEventDto) {
+        validateNotNullObject(userId, "userId");
+        validatePositiveNumber(userId, "userId");
+        validateNewEvent(newEventDto);
         User initiator = findUser(userId);
         Category category = findCategory(newEventDto.getCategory());
 
@@ -113,7 +121,11 @@ public class EventServiceImpl implements EventService {
 
     @Transactional
     @Override
-    public EventFullDto getUserEventFullByEventId(long userId, long eventId) {
+    public EventFullDto getUserEventFullByEventId(Long userId, Long eventId) {
+        validateNotNullObject(userId, "userId");
+        validatePositiveNumber(userId, "userId");
+        validateNotNullObject(eventId, "eventId");
+        validatePositiveNumber(eventId, "eventId");
         findUser(userId);
         Event event = findEvent(eventId);
 
@@ -126,7 +138,12 @@ public class EventServiceImpl implements EventService {
 
     @Transactional
     @Override
-    public EventFullDto updateEventByUser(long userId, long eventId, UpdateEventRequest updateEventDto) {
+    public EventFullDto updateEventByUser(Long userId, Long eventId, UpdateEventRequest updateEventDto) {
+        validateNotNullObject(userId, "userId");
+        validatePositiveNumber(userId, "userId");
+        validateNotNullObject(eventId, "eventId");
+        validatePositiveNumber(eventId, "eventId");
+        validateUpdateEvent(updateEventDto, false);
         findUser(userId);
         Event event = findEvent(eventId);
         if (event.getInitiator().getId() != userId)
@@ -141,7 +158,11 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public List<ParticipationRequestDto> getUserEventParticipationRequests(long userId, long eventId) {
+    public List<ParticipationRequestDto> getUserEventParticipationRequests(Long userId, Long eventId) {
+        validateNotNullObject(userId, "userId");
+        validatePositiveNumber(userId, "userId");
+        validateNotNullObject(eventId, "eventId");
+        validatePositiveNumber(eventId, "eventId");
         findUser(userId);
         findEvent(eventId);
         return participationRepository.findAllRequestsByEventIdAndInitiatorId(userId, eventId).stream()
@@ -151,8 +172,14 @@ public class EventServiceImpl implements EventService {
 
     @Transactional
     @Override
-    public EventRequestStatusUpdateResult changeParticipationStatus(long userId, long eventId,
+    public EventRequestStatusUpdateResult changeParticipationStatus(Long userId, Long eventId,
             EventRequestStatusUpdateRequest statusUpdateRequest) {
+        validateNotNullObject(userId, "userId");
+        validatePositiveNumber(userId, "userId");
+        validateNotNullObject(eventId, "eventId");
+        validatePositiveNumber(eventId, "eventId");
+        validateNotNullObject(statusUpdateRequest, "EventRequestStatusUpdateRequest");
+        validateUpdateRequestStatus(statusUpdateRequest);
         User initiator = findUser(userId);
         Event event = findEvent(eventId);
         if (initiator.getId() != event.getInitiator().getId())
@@ -198,6 +225,20 @@ public class EventServiceImpl implements EventService {
     @Override
     public List<EventFullDto> searchEvents(List<Long> users, List<String> states, List<Long> categories,
             String rangeStart, String rangeEnd, int from, int size) {
+        if (users != null) {
+            users.forEach(x -> validateNotNullObject(x, "users"));
+            users.forEach(x -> validatePositiveNumber(x, "users"));
+        }
+        if (categories != null) {
+            categories.forEach(x -> validateNotNullObject(x, "categories"));
+            categories.forEach(x -> validatePositiveNumber(x, "categories"));
+        }
+        if (rangeStart != null)
+            validateDateTimeFormat(rangeStart, "rangeStart");
+        if (rangeEnd != null)
+            validateDateTimeFormat(rangeEnd, "rangeEnd");
+        validatePageableParams(from, size);
+
         LocalDateTime start = null;
         LocalDateTime end = null;
         List<EventState> eventStatesList = null;
@@ -221,7 +262,11 @@ public class EventServiceImpl implements EventService {
 
     @Transactional
     @Override
-    public EventFullDto updateEventByAdmin(long eventId, UpdateEventRequest updateEventDto) {
+    public EventFullDto updateEventByAdmin(Long eventId, UpdateEventRequest updateEventDto) {
+        validateNotNullObject(eventId, "eventId");
+        validatePositiveNumber(eventId, "eventId");
+        validateNotNullObject(updateEventDto, "UpdateEventAdminRequest");
+        validateUpdateEvent(updateEventDto, true);
         Event event = findEvent(eventId);
         changeEvent(event, updateEventDto, true);
         return toEventFullDto(event);
@@ -231,6 +276,20 @@ public class EventServiceImpl implements EventService {
     public List<EventShortDto> getEventFiltered(HttpServletRequest request, String text, List<Long> categories,
             Boolean paid, String rangeStart, String rangeEnd, boolean onlyAvailable,
             String sort, int from, int size) {
+        if (text != null)
+            validateStringNotBlank(text, "text");
+        if (categories != null) {
+            categories.forEach(x -> validateNotNullObject(x, "categories"));
+            categories.forEach(x -> validatePositiveNumber(x, "categories"));
+        }
+        if (rangeStart != null)
+            validateDateTimeFormat(rangeStart, "rangeStart");
+        if (rangeEnd != null)
+            validateDateTimeFormat(rangeEnd, "rangeEnd");
+        if (sort != null)
+            validateSortOptions(sort);
+        validatePageableParams(from, size);
+
         makeStatsHit(request);
         Sort sortParam;
         Pageable pageable;
@@ -259,7 +318,9 @@ public class EventServiceImpl implements EventService {
 
     @Transactional
     @Override
-    public EventFullDto getEventById(HttpServletRequest request, long eventId) {
+    public EventFullDto getEventById(HttpServletRequest request, Long eventId) {
+        validateNotNullObject(eventId, "id");
+        validatePositiveNumber(eventId, "id");
         makeStatsHit(request);
         Event event = eventRepository.findPublishedEvent(eventId).orElseThrow(
                 () -> new EntityNotFoundException("Required entity not found",

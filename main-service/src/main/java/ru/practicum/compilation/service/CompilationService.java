@@ -9,11 +9,11 @@ import java.util.List;
 public interface CompilationService {
     List<CompilationDto> getCompilation(Boolean pinned, int from, int size);
 
-    CompilationDto getCompilationById(long compId);
+    CompilationDto getCompilationById(Long compId);
 
     CompilationDto createCompilation(NewCompilationDto newCompilationDto);
 
-    void deleteCompilation(long compId);
+    void deleteCompilation(Long compId);
 
-    CompilationDto updateCompilation(long compId, UpdateCompilationDto updateCompilationDto);
+    CompilationDto updateCompilation(Long compId, UpdateCompilationDto updateCompilationDto);
 }

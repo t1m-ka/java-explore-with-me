@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static ru.practicum.participation.dto.ParticipationMapper.toParticipationRequestDto;
+import static ru.practicum.util.VariableValidator.validateNotNullObject;
+import static ru.practicum.util.VariableValidator.validatePositiveNumber;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +33,9 @@ public class ParticipationServiceImpl implements ParticipationService {
     private final EventRepository eventRepository;
 
     @Override
-    public List<ParticipationRequestDto> getUserParticipationRequestList(long userId) {
+    public List<ParticipationRequestDto> getUserParticipationRequestList(Long userId) {
+        validateNotNullObject(userId, "userId");
+        validatePositiveNumber(userId, "userId");
         userRepository.findById(userId).orElseThrow(
                 () -> new EntityNotFoundException("Required entity not found",
                         "User with id=" + userId + "was not found"));
@@ -43,7 +47,11 @@ public class ParticipationServiceImpl implements ParticipationService {
 
     @Transactional
     @Override
-    public ParticipationRequestDto createParticipationRequest(long userId, long eventId) {
+    public ParticipationRequestDto createParticipationRequest(Long userId, Long eventId) {
+        validateNotNullObject(userId, "userId");
+        validatePositiveNumber(userId, "userId");
+        validateNotNullObject(eventId, "eventId");
+        validatePositiveNumber(eventId, "eventId");
         User requester = userRepository.findById(userId).orElseThrow(
                 () -> new EntityNotFoundException("Required entity not found",
                         "User with id=" + userId + "was not found"));
@@ -89,7 +97,11 @@ public class ParticipationServiceImpl implements ParticipationService {
 
     @Transactional
     @Override
-    public ParticipationRequestDto cancelParticipationRequest(long userId, long requestId) {
+    public ParticipationRequestDto cancelParticipationRequest(Long userId, Long requestId) {
+        validateNotNullObject(userId, "userId");
+        validatePositiveNumber(userId, "userId");
+        validateNotNullObject(requestId, "requestId");
+        validatePositiveNumber(requestId, "requestId");
         ParticipationRequest participationRequest = participationRepository.findById(requestId).orElseThrow(
                 () -> new EntityNotFoundException("Required entity not found",
                         "Request with id=" + requestId + "was not found"));

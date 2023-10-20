@@ -7,17 +7,17 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 public interface EventService {
-    List<EventShortDto> getUserEventList(long userId, int from, int size);
+    List<EventShortDto> getUserEventList(Long userId, int from, int size);
 
-    EventFullDto createEvent(long userId, NewEventDto newEventDto);
+    EventFullDto createEvent(Long userId, NewEventDto newEventDto);
 
-    EventFullDto getUserEventFullByEventId(long userId, long eventId);
+    EventFullDto getUserEventFullByEventId(Long userId, Long eventId);
 
-    EventFullDto updateEventByUser(long userId, long eventId, UpdateEventRequest updateEventDto);
+    EventFullDto updateEventByUser(Long userId, Long eventId, UpdateEventRequest updateEventDto);
 
-    List<ParticipationRequestDto> getUserEventParticipationRequests(long userId, long eventId);
+    List<ParticipationRequestDto> getUserEventParticipationRequests(Long userId, Long eventId);
 
-    EventRequestStatusUpdateResult changeParticipationStatus(long userId, long eventId,
+    EventRequestStatusUpdateResult changeParticipationStatus(Long userId, Long eventId,
             EventRequestStatusUpdateRequest statusUpdateRequest);
 
     List<EventFullDto> searchEvents(
@@ -29,7 +29,7 @@ public interface EventService {
             int from,
             int size);
 
-    EventFullDto updateEventByAdmin(long eventId, UpdateEventRequest updateEventDto);
+    EventFullDto updateEventByAdmin(Long eventId, UpdateEventRequest updateEventDto);
 
     List<EventShortDto> getEventFiltered(
             HttpServletRequest request,
@@ -43,5 +43,5 @@ public interface EventService {
             int from,
             int size);
 
-    EventFullDto getEventById(HttpServletRequest request, long eventId);
+    EventFullDto getEventById(HttpServletRequest request, Long eventId);
 }

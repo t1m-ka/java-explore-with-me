@@ -11,9 +11,6 @@ import ru.practicum.participation.dto.ParticipationRequestDto;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
-import static ru.practicum.event.dto.EventDtoValidator.*;
-import static ru.practicum.util.VariableValidator.*;
-
 @RestController
 @RequiredArgsConstructor
 @Slf4j
@@ -25,9 +22,6 @@ public class EventController {
             @PathVariable Long userId,
             @RequestParam(required = false, defaultValue = "0") int from,
             @RequestParam(required = false, defaultValue = "10") int size) {
-        validateNotNullObject(userId, "userId");
-        validatePositiveNumber(userId, "userId");
-        validatePageableParams(from, size);
         return service.getUserEventList(userId, from, size);
     }
 
@@ -36,9 +30,6 @@ public class EventController {
     public EventFullDto createEvent(
             @PathVariable Long userId,
             @RequestBody NewEventDto newEventDto) {
-        validateNotNullObject(userId, "userId");
-        validatePositiveNumber(userId, "userId");
-        validateNewEvent(newEventDto);
         return service.createEvent(userId, newEventDto);
     }
 
@@ -46,10 +37,6 @@ public class EventController {
     public EventFullDto getUserEventFullByEventId(
             @PathVariable Long userId,
             @PathVariable Long eventId) {
-        validateNotNullObject(userId, "userId");
-        validatePositiveNumber(userId, "userId");
-        validateNotNullObject(eventId, "eventId");
-        validatePositiveNumber(eventId, "eventId");
         return service.getUserEventFullByEventId(userId, eventId);
     }
 
@@ -58,11 +45,6 @@ public class EventController {
             @PathVariable Long userId,
             @PathVariable Long eventId,
             @RequestBody UpdateEventRequest updateEventDto) {
-        validateNotNullObject(userId, "userId");
-        validatePositiveNumber(userId, "userId");
-        validateNotNullObject(eventId, "eventId");
-        validatePositiveNumber(eventId, "eventId");
-        validateUpdateEvent(updateEventDto, false);
         return service.updateEventByUser(userId, eventId, updateEventDto);
     }
 
@@ -70,10 +52,6 @@ public class EventController {
     public List<ParticipationRequestDto> getUserEventParticipationRequests(
             @PathVariable Long userId,
             @PathVariable Long eventId) {
-        validateNotNullObject(userId, "userId");
-        validatePositiveNumber(userId, "userId");
-        validateNotNullObject(eventId, "eventId");
-        validatePositiveNumber(eventId, "eventId");
         return service.getUserEventParticipationRequests(userId, eventId);
     }
 
@@ -82,12 +60,6 @@ public class EventController {
             @PathVariable Long userId,
             @PathVariable Long eventId,
             @RequestBody EventRequestStatusUpdateRequest statusUpdateRequest) {
-        validateNotNullObject(userId, "userId");
-        validatePositiveNumber(userId, "userId");
-        validateNotNullObject(eventId, "eventId");
-        validatePositiveNumber(eventId, "eventId");
-        validateNotNullObject(statusUpdateRequest, "EventRequestStatusUpdateRequest");
-        validateUpdateRequestStatus(statusUpdateRequest);
         return service.changeParticipationStatus(userId, eventId, statusUpdateRequest);
     }
 
@@ -100,19 +72,6 @@ public class EventController {
             @RequestParam(required = false) String rangeEnd,
             @RequestParam(required = false, defaultValue = "0") int from,
             @RequestParam(required = false, defaultValue = "10") int size) {
-        if (users != null) {
-            users.forEach(x -> validateNotNullObject(x, "users"));
-            users.forEach(x -> validatePositiveNumber(x, "users"));
-        }
-        if (categories != null) {
-            categories.forEach(x -> validateNotNullObject(x, "categories"));
-            categories.forEach(x -> validatePositiveNumber(x, "categories"));
-        }
-        if (rangeStart != null)
-            validateDateTimeFormat(rangeStart, "rangeStart");
-        if (rangeEnd != null)
-            validateDateTimeFormat(rangeEnd, "rangeEnd");
-        validatePageableParams(from, size);
         return service.searchEvents(users, states, categories, rangeStart, rangeEnd, from, size);
     }
 
@@ -120,10 +79,6 @@ public class EventController {
     public EventFullDto updateEventByAdmin(
             @PathVariable Long eventId,
             @RequestBody UpdateEventRequest updateEventDto) {
-        validateNotNullObject(eventId, "eventId");
-        validatePositiveNumber(eventId, "eventId");
-        validateNotNullObject(updateEventDto, "UpdateEventAdminRequest");
-        validateUpdateEvent(updateEventDto, true);
         return service.updateEventByAdmin(eventId, updateEventDto);
     }
 
@@ -139,19 +94,6 @@ public class EventController {
             @RequestParam(required = false) String sort,
             @RequestParam(required = false, defaultValue = "0") int from,
             @RequestParam(required = false, defaultValue = "10") int size) {
-        if (text != null)
-            validateStringNotBlank(text, "text");
-        if (categories != null) {
-            categories.forEach(x -> validateNotNullObject(x, "categories"));
-            categories.forEach(x -> validatePositiveNumber(x, "categories"));
-        }
-        if (rangeStart != null)
-            validateDateTimeFormat(rangeStart, "rangeStart");
-        if (rangeEnd != null)
-            validateDateTimeFormat(rangeEnd, "rangeEnd");
-        if (sort != null)
-            validateSortOptions(sort);
-        validatePageableParams(from, size);
         return service.getEventFiltered(request, text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort,
                 from, size);
     }
@@ -160,8 +102,6 @@ public class EventController {
     public EventFullDto getEventById(
             HttpServletRequest request,
             @PathVariable("id") Long eventId) {
-        validateNotNullObject(eventId, "id");
-        validatePositiveNumber(eventId, "id");
         return service.getEventById(request, eventId);
     }
 }
