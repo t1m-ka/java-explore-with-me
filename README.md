@@ -29,3 +29,4 @@ ER-диаграмма базы данных основного сервиса:
 * DELETE /admin/comments/{commentId} - административный, удаление комментария администратором.
 
 Ссылка на PullRequest:
+https://github.com/t1m-ka/java-explore-with-me/pull/5
