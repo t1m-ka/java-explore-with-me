@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import ru.practicum.comment.model.ModerationReason;
-import ru.practicum.event.dto.EventShortDto;
 import ru.practicum.user.dto.UserShortDto;
 
 import java.time.LocalDateTime;
@@ -18,7 +17,7 @@ public class CommentFullDto {
 
     private String text;
 
-    private EventShortDto event;
+    private long event;
 
     private UserShortDto author;
 
