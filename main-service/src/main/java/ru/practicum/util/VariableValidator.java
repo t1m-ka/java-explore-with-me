@@ -1,6 +1,7 @@
 package ru.practicum.util;
 
 import org.apache.commons.lang3.StringUtils;
+import ru.practicum.comment.model.ModerationReason;
 import ru.practicum.event.dto.enums.EventAdminStateAction;
 import ru.practicum.event.dto.enums.EventUserStateAction;
 import ru.practicum.event.dto.enums.SortOption;
@@ -118,6 +119,14 @@ public class VariableValidator {
         if (!SortOption.isValid(value))
             throw new OperationForbiddenException("For the requested operation the conditions are not met",
                     "Field: sort. Error: значение статуса может быть: EVENT_DATE, VIEWS. "
+                            + "Value:" + value);
+    }
+
+    public static void validateModerationReason(String value) {
+        if (!ModerationReason.isValid(value))
+            throw new OperationForbiddenException("For the requested operation the conditions are not met",
+                    "Field: moderationReason. Error: значение причины модерации может быть: PROFANITY, SPAM, "
+                            + "ADVERTISEMENT, UNACCEPTABLE_CONTENT, INCORRECT_INFORMATION. "
                             + "Value:" + value);
     }
 }
