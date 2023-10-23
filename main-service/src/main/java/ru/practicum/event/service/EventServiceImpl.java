@@ -10,6 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.category.model.Category;
 import ru.practicum.category.repository.CategoryRepository;
+import ru.practicum.comment.dto.CommentFullDto;
+import ru.practicum.comment.dto.CommentMapper;
+import ru.practicum.comment.repository.CommentRepository;
 import ru.practicum.event.dto.*;
 import ru.practicum.event.dto.enums.SortOption;
 import ru.practicum.event.model.Event;
@@ -56,6 +59,7 @@ public class EventServiceImpl implements EventService {
     private final UserRepository userRepository;
     private final ParticipationRepository participationRepository;
     private final CategoryRepository categoryRepository;
+    private final CommentRepository commentRepository;
     private final HitClient hitClient;
     private final StatsClient statsClient;
 
@@ -63,6 +67,7 @@ public class EventServiceImpl implements EventService {
             UserRepository userRepository,
             ParticipationRepository participationRepository,
             CategoryRepository categoryRepository,
+            CommentRepository commentRepository,
             @Value("${stats-service.url}") String statServiceUrl,
             RestTemplateBuilder builder,
             ObjectMapper objectMapper) {
@@ -70,6 +75,7 @@ public class EventServiceImpl implements EventService {
         this.userRepository = userRepository;
         this.participationRepository = participationRepository;
         this.categoryRepository = categoryRepository;
+        this.commentRepository = commentRepository;
         this.hitClient = new HitClient(statServiceUrl, builder, objectMapper);
         this.statsClient = new StatsClient(statServiceUrl, builder, objectMapper);
     }
@@ -116,7 +122,7 @@ public class EventServiceImpl implements EventService {
                 .title(newEventDto.getTitle())
                 .views(views)
                 .build();
-        return toEventFullDto(eventRepository.save(newEvent));
+        return toEventFullDto(eventRepository.save(newEvent), new ArrayList<>());
     }
 
     @Transactional
@@ -133,7 +139,8 @@ public class EventServiceImpl implements EventService {
             throw new RequestConflictException("Invalid operation",
                     "Просмотр информации разрешен только инициатору события.");
         event.setViews(event.getViews() + 1);
-        return toEventFullDto(event);
+        List<CommentFullDto> commentList = findEventCommentsDto(eventId);
+        return toEventFullDto(event, commentList);
     }
 
     @Transactional
@@ -154,7 +161,8 @@ public class EventServiceImpl implements EventService {
                     "Событие уже опубликовано, редактирование запрещено.");
 
         changeEvent(event, updateEventDto, false);
-        return toEventFullDto(event);
+        List<CommentFullDto> commentList = findEventCommentsDto(eventId);
+        return toEventFullDto(event, commentList);
     }
 
     @Override
@@ -256,7 +264,10 @@ public class EventServiceImpl implements EventService {
 
         return eventRepository.searchEventsByAdmin(users, eventStatesList, categories,
                         start, end, makePageable(from, size)).stream()
-                .map(EventMapper::toEventFullDto)
+                .map(event -> {
+                    List<CommentFullDto> commentList = findEventCommentsDto(event.getId());
+                    return EventMapper.toEventFullDto(event, commentList);
+                })
                 .collect(Collectors.toList());
     }
 
@@ -269,7 +280,8 @@ public class EventServiceImpl implements EventService {
         validateUpdateEvent(updateEventDto, true);
         Event event = findEvent(eventId);
         changeEvent(event, updateEventDto, true);
-        return toEventFullDto(event);
+        List<CommentFullDto> commentList = findEventCommentsDto(event.getId());
+        return toEventFullDto(event, commentList);
     }
 
     @Override
@@ -332,7 +344,8 @@ public class EventServiceImpl implements EventService {
                 Collections.singletonList(request.getRequestURI()),
                 true);
         event.setViews(statsList.size());
-        return toEventFullDto(event);
+        List<CommentFullDto> commentList = findEventCommentsDto(event.getId());
+        return toEventFullDto(event, commentList);
     }
 
     private void makeStatsHit(HttpServletRequest request) {
@@ -402,5 +415,11 @@ public class EventServiceImpl implements EventService {
         }
         if (updateEventDto.getTitle() != null)
             event.setTitle(updateEventDto.getTitle());
+    }
+
+    private List<CommentFullDto> findEventCommentsDto(long eventId) {
+        return commentRepository.findAllByEventIdOrderByCreatedOn(eventId).stream()
+                .map(CommentMapper::toCommentFullDto)
+                .collect(Collectors.toList());
     }
 }
